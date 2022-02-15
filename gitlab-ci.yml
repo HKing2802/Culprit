@@ -1,0 +1,58 @@
+image:
+  name: node:12
+
+variables:
+  APP_NAME: amc7082-react #Change this to your React project name
+
+  PROJECT_NAME: client-4 #Change this when the project changes (e.g. client-3 etc): To your output web folder
+  OUTPUT_DIR: public/$PROJECT_NAME
+
+
+.script-create-dir: &script-create-dir |
+  if [ -d "$OUTPUT_DIR" ]; then
+
+  # Control will enter here if $DIRECTORY exists.
+
+    echo $OUTPUT_DIR "found, no need to create"
+  else
+    echo $OUTPUT_DIR "not found, creating ..."
+    mkdir $OUTPUT_DIR
+    ls -lFa $OUTPUT_DIR
+  fi
+
+cache:
+  paths:
+  - node_modules/
+
+before_script:
+  - *script-create-dir #This has to run before you change paths
+
+  - cd $APP_NAME #Go to your sub-directory path, so yarn and npm work
+
+  - pwd
+  - yarn install
+  - node --version
+
+pages:
+  stage: deploy
+  script:
+    # This magical incantation will inject a build version just before </body>"
+
+    - sed -i "s|</body>|<small>Built on GitLab branch <code>$CI_COMMIT_REF_NAME</code> commit <code>$CI_COMMIT_SHORT_SHA</code> $(date)</small></body>|g" public/index.html
+
+    - npm run build   # Do a production build to build/ folder
+
+ #   - rm -rf public   # React public/ shouldn't conflict with GitLab public/
+
+ #   - mv build public # Move to the directory GitLab pages expects
+
+    - rm -rf ../$OUTPUT_DIR # Remove the old files
+
+    - mv build ../$OUTPUT_DIR
+    - ls -lFa ../$OUTPUT_DIR #After the npm deploy
+
+    - echo "Your web page will be at /"$PROJECT_NAME
+
+  artifacts:
+    paths:
+    - public
