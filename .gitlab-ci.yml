@@ -2,9 +2,9 @@ image:
   name: node:12
 
 variables:
-  APP_NAME: amc7082-react #Change this to your React project name
+  APP_NAME: Culprit 
 
-  PROJECT_NAME: client-4 #Change this when the project changes (e.g. client-3 etc): To your output web folder
+  PROJECT_NAME: Culprit
   OUTPUT_DIR: public/$PROJECT_NAME
 
 
