@@ -1,0 +1,8 @@
+.startButtons {
+    padding-top: 3em;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    grid-gap: 0.5em;
+}
