@@ -1,8 +1,34 @@
 import React from 'react';
-import { ButtonGroup, Button } from 'reactstrap';
+import { ButtonGroup, Button, Navbar, NavbarBrand } from 'reactstrap';
 import './App.css';
 
 const pageComponentMap = new Map();
+
+class HeaderSession extends React.Component {
+    // slug
+}
+
+class Header extends React.Component {
+    constructor(props) {
+        super(props);
+    }
+
+    render() {
+        return (
+            <div className="header">
+                <Navbar
+                    color="dark"
+                    dark
+                    expand="sm"
+                >
+                    <NavbarBrand>
+                        Culprit
+                    </NavbarBrand>
+                </Navbar>
+            </div>
+        )
+    }
+}
 
 class NumPlayerSelect extends React.Component {
     render() {
@@ -53,7 +79,12 @@ class App extends React.Component {
     }
 
     render() {
-        return pageComponentMap.get(this.state.page);
+        return (
+            <div className="app">
+                <Header />
+                {pageComponentMap.get(this.state.page)}
+            </div>
+        )
     }
 }
 
