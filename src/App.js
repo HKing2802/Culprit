@@ -1,11 +1,18 @@
 import React from 'react';
-import { ButtonGroup, Button, Navbar, NavbarBrand } from 'reactstrap';
+import { ButtonGroup, Button, Navbar, NavbarBrand, NavbarText } from 'reactstrap';
 import './App.css';
 
 const pageComponentMap = new Map();
 
 class HeaderSession extends React.Component {
-    // slug
+    render() {
+        return (
+            <NavbarText className="sessionKeyText">
+                Session Key <br /> {this.props.sesKey}
+            </NavbarText>
+            
+        )
+    }
 }
 
 class Header extends React.Component {
@@ -19,11 +26,12 @@ class Header extends React.Component {
                 <Navbar
                     color="dark"
                     dark
-                    expand="sm"
+                    expand="md"
                 >
                     <NavbarBrand>
                         Culprit
                     </NavbarBrand>
+                    {this.props.sesKey ? <HeaderSession sesKey={this.props.sesKey} /> : null}
                 </Navbar>
             </div>
         )
@@ -81,7 +89,7 @@ class App extends React.Component {
     render() {
         return (
             <div className="app">
-                <Header />
+                <Header sesKey={ this.state.sessionKey } />
                 {pageComponentMap.get(this.state.page)}
             </div>
         )
