@@ -9,3 +9,20 @@
 .sessionKeyText {
     text-align: center;
 }
+
+.caseInput {
+    padding: 0.3em;
+}
+
+.caseSubmit {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.caseSubmitBtn {
+    background-color: blue;
+    color: white;
+    width: 5em;
+}
