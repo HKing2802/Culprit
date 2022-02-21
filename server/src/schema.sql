@@ -1,6 +1,45 @@
+DROP TABLE IF EXISTS sessions;
+DROP TABLE IF EXISTS cases;
 
--- Drops
+CREATE TABLE sessions (
+	id		VARCHAR(5) PRIMARY KEY,
+	created TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+)
 
+CREATE TABLE cases (
+	id			BIGINT PRIMARY KEY,
+	player_name	VARCHAR(50),
+	session		VARCHAR(5) REFERENCES sessions (id) ON DELETE CASCADE,
+	color		VARCHAR(10) NOT NULL,
+	weapon_id	INT NOT NULL,
+	victim_id	INT NOT NULL,
+	location_id	INT NOT NULL
+)
 
--- Table Creation
+CREATE TABLE solved (
+	id			BIGSERIAL PRIMARY KEY,
+	case_id		BIGINT NOT NULL,
+	player_name	VARCHAR(50) NOT NULL,
+	first		BOOLEAN
+)
 
+CREATE TABLE weapons (
+	id		INT PRIMARY KEY,
+	name	VARCHAR(50) NOT NULL,
+	tag1	VARCHAR(50) NOT NULL,
+	tag2	VARCHAR(50) NOT NULL,
+)
+
+CREATE TABLE victim (
+	id		INT PRIMARY KEY,
+	name	VARCHAR(50) NOT NULL,
+	tag1	VARCHAR(50) NOT NULL,
+	tag2	VARCHAR(50) NOT NULL,
+)
+
+CREATE TABLE location (
+	id		INT PRIMARY KEY,
+	name	VARCHAR(50) NOT NULL,
+	tag1	VARCHAR(50) NOT NULL,
+	tag2	VARCHAR(50) NOT NULL,
+)
