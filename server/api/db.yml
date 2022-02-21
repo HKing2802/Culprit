@@ -1,0 +1,5 @@
+host: localhost
+database: <replace>
+user: <replace>
+password: <replace>
+port: 5432
