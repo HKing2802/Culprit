@@ -5,13 +5,13 @@ import string
 
 # arg parsers
 caseSetupParser = reqparse.RequestParser()
-caseSetupParser.add_argument('name', type=string)
-caseSetupParser.add_argument('id', type=int)
-caseSetupParser.add_argument('session', type=string)
-caseSetupParser.add_argument('color', type=string)
-caseSetupParser.add_argument('weapon', type=string)
-caseSetupParser.add_argument('location', type=string)
-caseSetupParser.add_argument('victim', type=string)
+caseSetupParser.add_argument('name')
+caseSetupParser.add_argument('id')
+caseSetupParser.add_argument('session')
+caseSetupParser.add_argument('color')
+caseSetupParser.add_argument('weapon')
+caseSetupParser.add_argument('location')
+caseSetupParser.add_argument('victim')
 
 
 # Data Loading
