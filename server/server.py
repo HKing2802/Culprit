@@ -8,7 +8,7 @@ app = Flask(__name__) #create Flask instance
 
 api = Api(app) #api router
 
-api.add_resource(example,'/example_api')
+api.add_resource(CaseSetup,'/case-setup')
 
 if __name__ == '__main__':
     print("Building Database")
