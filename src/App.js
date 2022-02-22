@@ -3,6 +3,11 @@ import { ButtonGroup, Button, Navbar, NavbarBrand, NavbarText, Form, FormGroup, 
 import './App.css';
 
 const pageComponentMap = new Map();
+const playerNameMap = new Map();
+
+// ----------- DEV TEMP -----------
+playerNameMap.set(0, "Adam");
+// --------------------------------
 
 const SERVER_ADDR = "http://localhost:5000/"
 
@@ -132,7 +137,12 @@ class CaseSetup extends React.Component {
                 console.log(err);
             });
 
-        this.props.changePage("nextPlayerSetup");
+        if (this.props.checkSetupComplete()) {
+            this.props.loadPlayerNameMap();
+            this.props.changePage("nextPlayerTurn");
+        } else {
+            this.props.changePage("nextPlayerSetup");
+        }
     }
 
     updateInfo(e) {
@@ -318,7 +328,7 @@ class CaseSetup extends React.Component {
     }
 }
 
-class NextPlayerTurn extends React.Component {
+class NextPlayerSetup extends React.Component {
     constructor(props) {
         super(props);
 
@@ -346,6 +356,44 @@ class NextPlayerTurn extends React.Component {
     }
 }
 
+class NextPlayerTurn extends React.Component {
+    constructor(props) {
+        super(props);
+
+        // binding
+        this.nextPlayer = this.nextPlayer.bind(this);
+    }
+
+    nextPlayer() {
+        this.props.changePage("");
+        this.props.nextPlayer();
+    }
+
+    render() {
+        if (this.props.playerMapLoaded) {
+            return (
+                <div className="nextTurn">
+                    <h4> Next Turn </h4>
+                    <h1> {playerNameMap.get(CURRENT_PLAYER)} </h1>
+                    <Button
+                        className="nextTurnBtn"
+                        color="primary"
+                        onClick={this.nextPlayer}
+                    >
+                        Start Turn
+                    </Button>
+                </div>
+            )
+        } else {
+            return (
+                <div>
+                    Loading...
+                </div>
+            )
+        }
+    }
+}
+
 class App extends React.Component {
     constructor(props) {
         super(props);
@@ -354,18 +402,28 @@ class App extends React.Component {
         this.numPlayers = null;
 
         // binding
+        this.reloadPageComponentState = this.reloadPageComponentState.bind(this);
         this.changePage = this.changePage.bind(this);
         this.generateSesionKey = this.generateSesionKey.bind(this);
         this.setNumPlayers = this.setNumPlayers.bind(this);
         this.nextPlayer = this.nextPlayer.bind(this);
+        this.checkSetupComplete = this.checkSetupComplete.bind(this);
+        this.loadPlayerNameMap = this.loadPlayerNameMap.bind(this);
 
         // state init
-        this.state = { page: "numPlayerSelect", sessionKey: null };
+        this.state = { page: "nextPlayerTurn", sessionKey: null, playerMapLoaded: true };
 
         // loads PageComponent Map
+        this.reloadPageComponentState();
+    }
+
+    reloadPageComponentState() {
         pageComponentMap.set("numPlayerSelect", <NumPlayerSelect changePage={this.changePage} setNumPlayers={this.setNumPlayers} generateSesionKey={this.generateSesionKey} />);
-        pageComponentMap.set("caseSetup", <CaseSetup changePage={this.changePage} />);
-        pageComponentMap.set("nextPlayerSetup", <NextPlayerTurn changePage={this.changePage} nextPlayer={this.nextPlayer} />)
+        pageComponentMap.set("caseSetup", <CaseSetup changePage={this.changePage} checkSetupComplete={this.checkSetupComplete} loadPlayerNameMap={this.loadPlayerNameMap} />);
+        pageComponentMap.set("nextPlayerSetup", <NextPlayerSetup changePage={this.changePage} nextPlayer={this.nextPlayer} />);
+        pageComponentMap.set("nextPlayerTurn", <NextPlayerTurn playerMapLoaded={this.state.playerMapLoaded} changePage={this.changePage} nextPlayer={this.nextPlayer} />);
+
+        this.forceUpdate();
     }
 
     changePage(name) {
@@ -397,6 +455,36 @@ class App extends React.Component {
             nextPlayerNum = 0;
         }
         CURRENT_PLAYER = nextPlayerNum;
+    }
+
+    checkSetupComplete() {
+        return (CURRENT_PLAYER >= this.numPlayers - 1)
+    }
+
+    async loadPlayerNameMap() {
+        this.setState({ playerMapLoaded: false });
+        this.reloadPageComponentState();
+        let id = 0;
+
+        while (id < this.numPlayers) {
+            const Response = await fetch(`${SERVER_ADDR}name`, {
+                mode: 'cors',
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ session: SESSION_KEY, id: id })
+            });
+
+            const name = await Response.json();
+
+            console.log(`Received ${name} for ${id}`);
+            playerNameMap.set(id, name);
+            id++;
+        }
+
+        this.setState({ playerMapLoaded: true });
+        this.reloadPageComponentState();
     }
 
     render() {
