@@ -42,3 +42,7 @@ def generateSessionKey(size=5):
     exec_commit('INSERT INTO sessions (id) VALUES (%(key)s);', {'key': key});
 
     return key
+
+def getPlayerNameFromId(session, id):
+    case_id = session + str(id)
+    return exec_get_one("SELECT player_name FROM cases WHERE id=%(cid)s;", {'cid': case_id})

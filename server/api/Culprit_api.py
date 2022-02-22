@@ -13,6 +13,9 @@ caseSetupParser.add_argument('weapon')
 caseSetupParser.add_argument('location')
 caseSetupParser.add_argument('victim')
 
+playerNameParser = reqparse.RequestParser()
+playerNameParser.add_argument('session')
+playerNameParser.add_argument('id')
 
 # Data Loading
 
@@ -34,3 +37,8 @@ class CaseSetup(Resource):
         args = caseSetupParser.parse_args()
         createNewCase(args['name'], args['id'], args['session'], args['color'], args['weapon'], args['location'], args['victim'])
         return {}, 201
+
+class PlayerName(Resource):
+    def post(self):
+        args = playerNameParser.parse_args()
+        return getPlayerNameFromId(args['session'], args['id']), 200
