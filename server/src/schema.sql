@@ -13,7 +13,7 @@ CREATE TABLE sessions (
 CREATE TABLE cases (
 	id			VARCHAR(6) PRIMARY KEY,
 	player_name	VARCHAR(50),
-	session		VARCHAR(5) REFERENCES sessions (id) ON DELETE CASCADE,
+	session		VARCHAR(5),
 	color		VARCHAR(10) NOT NULL,
 	weapon_id	INT NOT NULL,
 	victim_id	INT NOT NULL,
