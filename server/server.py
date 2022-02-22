@@ -1,4 +1,4 @@
-from flask import Flask, after_request
+from flask import Flask
 from flask_restful import Resource, Api
 from flask_cors import CORS
 
@@ -11,6 +11,7 @@ CORS(app)
 api = Api(app) #api router
 
 api.add_resource(CaseSetup,'/case-setup')
+api.add_resource(Session, '/key')
 
 if __name__ == '__main__':
     print("Building Database")

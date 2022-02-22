@@ -25,8 +25,12 @@ def load_game_data():
 
 # Resource Classes
 
+class Session(Resource):
+    def get(self):
+        return generateSessionKey(), 200
+
 class CaseSetup(Resource):
-    def put(self):
+    def post(self):
         args = caseSetupParser.parse_args()
         createNewCase(args['name'], args['id'], args['session'], args['color'], args['weapon'], args['location'], args['victim'])
-        return {}, 201, {'Access-Control-Allow-Origin': '*'}
+        return {}, 201
