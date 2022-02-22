@@ -3,13 +3,13 @@ from api.db_utils import *
 # Database-Client Interactions
 
 def get_weapon_id(name):
-    exec_get_one("SELECT id FROM weapons WHERE name=%(name)s;", {'name': name})
+    return exec_get_one("SELECT id FROM weapons WHERE name=%(name)s;", {'name': name})
 
 def get_victim_id(name):
-    exec_get_one("SELECT id FROM victims WHERE name=%(name)s;", {'name': name})
+    return exec_get_one("SELECT id FROM victims WHERE name=%(name)s;", {'name': name})
 
 def get_location_id(name):
-    exec_get_one("SELECT id FROM locations WHERE name=%(name)s;", {'name': name})
+    return exec_get_one("SELECT id FROM locations WHERE name=%(name)s;", {'name': name})
 
 
 def createNewCase(name, player_id, session, color, weapon, location, victim):
