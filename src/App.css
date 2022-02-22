@@ -38,3 +38,39 @@
 .nextTurnBtn {
     margin-top: 2em;
 }
+
+.actionSelect {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    padding-top: 2em;
+    grid-gap: 2em;
+}
+
+.actionBtn {
+    width: 12em;
+}
+
+.actionSelectName {
+    margin-bottom: -1em;
+}
+
+.endTurnConfirmation {
+    padding-top: 8em;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    grid-gap: 1em;
+}
+
+.confirmBtn {
+    width: 5em;
+}
+
+.backBtn {
+    margin-left: 0.4em;
+    margin-top: 0.4em;
+}
