@@ -26,3 +26,15 @@
     color: white;
     width: 5em;
 }
+
+.nextTurn {
+    padding-top: 2em;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.nextTurnBtn {
+    margin-top: 2em;
+}
