@@ -11,7 +11,7 @@ CREATE TABLE sessions (
 );
 
 CREATE TABLE cases (
-	id			BIGINT PRIMARY KEY,
+	id			VARCHAR(6) PRIMARY KEY,
 	player_name	VARCHAR(50),
 	session		VARCHAR(5) REFERENCES sessions (id) ON DELETE CASCADE,
 	color		VARCHAR(10) NOT NULL,
