@@ -3,6 +3,9 @@ import { ButtonGroup, Button, Navbar, NavbarBrand, NavbarText, Form, FormGroup, 
 import './App.css';
 
 const pageComponentMap = new Map();
+
+const SERVER_ADDR = "http://localhost:5000/"
+
 let CURRENT_PLAYER = 0;
 let SESSION_KEY = null;
 
@@ -49,6 +52,7 @@ class NumPlayerSelect extends React.Component {
     }
 
     setNumPlayers(e) {
+        this.props.generateSesionKey();
         this.props.setNumPlayers(e.target.value);
         this.props.changePage("caseSetup");
     }
@@ -113,7 +117,7 @@ class CaseSetup extends React.Component {
         this.info.set('id', CURRENT_PLAYER);
         this.info.set('session', SESSION_KEY);
 
-        fetch("http://192.168.1.145:5000/case-setup", {
+        fetch(`${SERVER_ADDR}case-setup`, {
             method: 'POST',
             mode: 'cors',
             headers: {
@@ -356,10 +360,10 @@ class App extends React.Component {
         this.nextPlayer = this.nextPlayer.bind(this);
 
         // state init
-        this.state = { page: "caseSetup", sessionKey: null };
+        this.state = { page: "numPlayerSelect", sessionKey: null };
 
         // loads PageComponent Map
-        pageComponentMap.set("numPlayerSelect", <NumPlayerSelect changePage={this.changePage} setNumPlayers={this.setNumPlayers} />);
+        pageComponentMap.set("numPlayerSelect", <NumPlayerSelect changePage={this.changePage} setNumPlayers={this.setNumPlayers} generateSesionKey={this.generateSesionKey} />);
         pageComponentMap.set("caseSetup", <CaseSetup changePage={this.changePage} />);
         pageComponentMap.set("nextPlayerSetup", <NextPlayerTurn changePage={this.changePage} nextPlayer={this.nextPlayer} />)
     }
@@ -369,9 +373,13 @@ class App extends React.Component {
     }
 
     generateSesionKey() {
-        // get a session key
-        this.setState({ sessionKey: "" });
-        SESSION_KEY = "";
+        fetch(`${SERVER_ADDR}key`, { mode: 'cors' })
+            .then(res => res.json())
+            .then(result => {
+                this.setState({ sessionKey: result });
+                SESSION_KEY = result;
+            });
+        
     }
 
     setNumPlayers(n) {
