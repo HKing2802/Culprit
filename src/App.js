@@ -4,6 +4,7 @@ import './App.css';
 
 const pageComponentMap = new Map();
 let CURRENT_PLAYER = 0;
+let SESSION_KEY = null;
 
 class HeaderSession extends React.Component {
     render() {
@@ -109,7 +110,21 @@ class CaseSetup extends React.Component {
     }
 
     submitCaseInfo() {
-        // POST request for case info submission
+        this.info.set('id', CURRENT_PLAYER);
+        this.info.set('session', SESSION_KEY);
+
+        fetch("http://192.168.1.145:5000/case-setup", {
+            method: 'PUT',
+            mode: 'cors',
+            body: JSON.stringify(Object.fromEntries(this.info))
+        })
+            .then(response => {
+                console.log(`Case info submitted with status code ${response.status}`);
+            })
+            .catch(err => {
+                console.log(err);
+            });
+
         this.props.changePage("nextPlayerSetup");
     }
 
@@ -353,6 +368,7 @@ class App extends React.Component {
     generateSesionKey() {
         // get a session key
         this.setState({ sessionKey: "" });
+        SESSION_KEY = "";
     }
 
     setNumPlayers(n) {
