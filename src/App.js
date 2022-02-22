@@ -114,8 +114,11 @@ class CaseSetup extends React.Component {
         this.info.set('session', SESSION_KEY);
 
         fetch("http://192.168.1.145:5000/case-setup", {
-            method: 'PUT',
+            method: 'POST',
             mode: 'cors',
+            headers: {
+                'Content-Type': 'application/json'
+            },
             body: JSON.stringify(Object.fromEntries(this.info))
         })
             .then(response => {
