@@ -365,8 +365,7 @@ class NextPlayerTurn extends React.Component {
     }
 
     nextPlayer() {
-        this.props.changePage("");
-        this.props.nextPlayer();
+        this.props.changePage("playerActionSelect");
     }
 
     render() {
@@ -383,14 +382,183 @@ class NextPlayerTurn extends React.Component {
                         Start Turn
                     </Button>
                 </div>
-            )
+            );
         } else {
             return (
                 <div>
                     Loading...
                 </div>
-            )
+            );
         }
+    }
+}
+
+class PlayerActionSelect extends React.Component {
+    constructor(props) {
+        super(props)
+
+        // binding
+        this.startPoll = this.startPoll.bind(this);
+        this.startAccuse = this.startAccuse.bind(this);
+        this.startCheckEndOfGame = this.startCheckEndOfGame.bind(this);
+        this.endTurn = this.endTurn.bind(this);
+    }
+
+    startPoll() {
+        this.props.changePage("poll");
+    }
+
+    startAccuse() {
+        this.props.changePage("accuse");
+    }
+
+    startCheckEndOfGame() {
+        this.props.changePage("endOfGame");
+    }
+
+    endTurn() {
+        this.props.changePage("endTurnConfirm");
+    }
+
+    render() {
+        return (
+            <div className="actionSelect">
+                <h4 className="actionSelectName"> {playerNameMap.get(CURRENT_PLAYER)} </h4>
+                <h1> Actions </h1>
+                <Button
+                    className="actionBtn"
+                    color="primary"
+                    onClick={this.startPoll}
+                >
+                    Poll
+                </Button>
+                <Button
+                    className="actionBtn"
+                    color="primary"
+                    onClick={this.startAccuse}
+                >
+                    Accuse
+                </Button>
+                <Button
+                    className="actionBtn"
+                    color="primary"
+                    onClick={this.startCheckEndOfGame}
+                >
+                    Check for End of Game
+                </Button>
+                <Button
+                    className="actionBtn"
+                    color="primary"
+                    onClick={this.endTurn}
+                >
+                    End Turn
+                </Button>
+            </div>
+        );
+    }
+}
+
+class BackBtn extends React.Component {
+    constructor(props) {
+        super(props);
+
+        // binding
+        this.back = this.back.bind(this);
+    }
+
+    back() {
+        this.props.changePage(this.props.prevPage);
+    }
+
+    render() {
+        return (
+            <Button
+                className="backBtn"
+                color="primary"
+                onClick={this.back}
+            >
+                Back
+            </Button>
+        )
+    }
+}
+
+class Poll extends React.Component {
+    render() {
+        return (
+            <div>
+                <BackBtn changePage={this.props.changePage} prevPage="playerActionSelect"/>
+                <div className="poll">
+                    Loading...
+                </div>
+            </div>
+        )
+    }
+}
+
+class Accuse extends React.Component {
+    render() {
+        return (
+            <div>
+                <BackBtn changePage={this.props.changePage} prevPage="playerActionSelect" />
+                <div className="accuse">
+                    Loading...
+                </div>
+            </div>
+        )
+    }
+}
+
+class EndofGame extends React.Component {
+    render() {
+        return (
+            <div>
+                <div className="endOfGame">
+                    Loading...
+                </div>
+            </div>
+        )
+    }
+}
+
+class EndTurnConfirm extends React.Component {
+    constructor(props) {
+        super(props);
+
+        // binding
+        this.confirm = this.confirm.bind(this);
+        this.back = this.back.bind(this);
+    }
+
+    confirm() {
+        this.props.changePage("nextPlayerTurn");
+        this.props.nextPlayer();
+    }
+
+    back() {
+        this.props.changePage("playerActionSelect");
+    }
+
+    render() {
+        return (
+            <div className="endTurnConfirmation">
+                <h3> Are you sure you want <br /> to end your turn? </h3>
+                <Button
+                    className="confirmBtn"
+                    color="primary"
+                    onClick={this.confirm}
+                >
+                    Yes
+                </Button>
+                <Button
+                    className="confirmBtn"
+                    color="primary"
+                    onClick={this.back}
+                >
+                    No
+                </Button>
+            </div>
+        )
     }
 }
 
@@ -411,7 +579,7 @@ class App extends React.Component {
         this.loadPlayerNameMap = this.loadPlayerNameMap.bind(this);
 
         // state init
-        this.state = { page: "nextPlayerTurn", sessionKey: null, playerMapLoaded: true };
+        this.state = { page: "playerActionSelect", sessionKey: null, playerMapLoaded: true };
 
         // loads PageComponent Map
         this.reloadPageComponentState();
@@ -421,7 +589,12 @@ class App extends React.Component {
         pageComponentMap.set("numPlayerSelect", <NumPlayerSelect changePage={this.changePage} setNumPlayers={this.setNumPlayers} generateSesionKey={this.generateSesionKey} />);
         pageComponentMap.set("caseSetup", <CaseSetup changePage={this.changePage} checkSetupComplete={this.checkSetupComplete} loadPlayerNameMap={this.loadPlayerNameMap} />);
         pageComponentMap.set("nextPlayerSetup", <NextPlayerSetup changePage={this.changePage} nextPlayer={this.nextPlayer} />);
-        pageComponentMap.set("nextPlayerTurn", <NextPlayerTurn playerMapLoaded={this.state.playerMapLoaded} changePage={this.changePage} nextPlayer={this.nextPlayer} />);
+        pageComponentMap.set("nextPlayerTurn", <NextPlayerTurn playerMapLoaded={this.state.playerMapLoaded} changePage={this.changePage} />);
+        pageComponentMap.set("playerActionSelect", <PlayerActionSelect changePage={this.changePage} />);
+        pageComponentMap.set("poll", <Poll changePage={this.changePage} />);
+        pageComponentMap.set("accuse", <Accuse changePage={this.changePage} />);
+        pageComponentMap.set("endOfGame", <EndofGame />);
+        pageComponentMap.set("endTurnConfirm", <EndTurnConfirm changePage={this.changePage} nextPlayer={this.nextPlayer} />);
 
         this.forceUpdate();
     }
