@@ -1,18 +1,24 @@
 import React from 'react';
-import { ButtonGroup, Button, Navbar, NavbarBrand, NavbarText, Form, FormGroup, Label, Input } from 'reactstrap';
+import { ButtonGroup, Button, Navbar, NavbarBrand, NavbarText, Form, FormGroup, Label, Input, Container, Row, Col } from 'reactstrap';
 import './App.css';
 
 const pageComponentMap = new Map();
 const playerNameMap = new Map();
 
+const pollData = new Map();
+let pollTarget = null;
+
 // ----------- DEV TEMP -----------
-playerNameMap.set(0, "Adam");
+// playerNameMap.set(0, "Adam");
 // --------------------------------
 
 const SERVER_ADDR = "http://localhost:5000/"
 
 let CURRENT_PLAYER = 0;
 let SESSION_KEY = null;
+let NUM_PLAYERS = null;
+
+// ----------------------- Headers -----------------------
 
 class HeaderSession extends React.Component {
     render() {
@@ -47,6 +53,9 @@ class Header extends React.Component {
         )
     }
 }
+
+
+// ----------------------- Game Setup -----------------------
 
 class NumPlayerSelect extends React.Component {
     constructor(props) {
@@ -121,6 +130,7 @@ class CaseSetup extends React.Component {
     submitCaseInfo() {
         this.info.set('id', CURRENT_PLAYER);
         this.info.set('session', SESSION_KEY);
+        this.info.set('tokens', NUM_PLAYERS > 4 ? 3 : 2);
 
         fetch(`${SERVER_ADDR}case-setup`, {
             method: 'POST',
@@ -245,7 +255,7 @@ class CaseSetup extends React.Component {
                         type="select"
                         onChange={this.updateInfo}
                     >
-                        <option selected default />
+                        <option selected hidden />
                         <option value="hammer">
                             Hammer
                         </option>
@@ -355,6 +365,9 @@ class NextPlayerSetup extends React.Component {
         )
     }
 }
+
+
+// ----------------------- Main Loop -----------------------
 
 class NextPlayerTurn extends React.Component {
     constructor(props) {
@@ -483,18 +496,361 @@ class BackBtn extends React.Component {
     }
 }
 
+
+// ----------------------- Poll -----------------------
+
 class Poll extends React.Component {
+    constructor(props) {
+        super(props);
+
+        // bindings
+        this.setData = this.setData.bind(this);
+    }
+
+    setData(e) {
+        console.log(`setting data: ${e.target.value}`);
+
+        pollData.clear();
+        pollData.set('type', e.target.value);
+        this.props.changePage("pollTag");
+    }
+    
     render() {
         return (
             <div>
                 <BackBtn changePage={this.props.changePage} prevPage="playerActionSelect"/>
                 <div className="poll">
-                    Loading...
+                    <Button
+                        className="pollTypeBtn"
+                        color="primary"
+                        value="weapon"
+                        onClick={this.setData}
+                    >
+                        Weapon
+                    </Button>
+                    <Button
+                        className="pollTypeBtn"
+                        color="primary"
+                        value="location"
+                        onClick={this.setData}
+                    >
+                        Location
+                    </Button>
+                    <Button
+                        className="pollTypeBtn"
+                        color="primary"
+                        value="victim"
+                        onClick={this.setData}
+                    >
+                        Victim
+                    </Button>
                 </div>
             </div>
         )
     }
 }
+
+class PollTag extends React.Component {
+    constructor(props) {
+        super(props);
+
+        // bindings
+        this.setData = this.setData.bind(this);
+
+        // tag hardcodes
+        this.tagMap = new Map();
+        this.tagMap.set('weapon', ['One-Handed', 'Ranged', 'Two-Handed', 'Sharp', 'Quick', 'Blunt']);
+        this.tagMap.set('location', ['Exterior', 'Core', 'Interior', 'Leisure', 'Underground', 'Occupational']);
+        this.tagMap.set('victim', ['Retired', 'Lower-Class', 'Student', 'Middle-Class', 'Working', 'Upper-Class']);
+    }
+
+    setData(e) {
+        pollData.set('tag', e.target.value);
+        pollData.set('anon', 0);
+        pollTarget = CURRENT_PLAYER;
+
+        this.props.nextPlayer();
+        this.props.changePage("nextPlayerPoll");
+    }
+
+    render() {
+        console.log(pollData);
+        const type = pollData.get('type');
+        if (type === null) {
+            return (
+                <div>
+                    <BackBtn changePage={this.props.changePage} prevPage="playerActionSelect" />
+                    <div className="pollTagLoading">
+                        Loading...
+                    </div>
+                </div>
+            );
+        }
+        return (
+            <div>
+                <BackBtn changePage={this.props.changePage} prevPage="poll" />
+                <Container className="pollTag">
+                    <Row xs='2' className="pollTagRow">
+                        <Col className="tagBtnCol" >
+                            <Button
+                                color='primary'
+                                value={this.tagMap.get(type)[0].toLowerCase()}
+                                onClick={this.setData}
+                            >
+                                {this.tagMap.get(type)[0]}
+                            </Button>
+                        </Col>
+                        <Col className="tagBtnCol" >
+                            <Button
+                                color='primary'
+                                value={this.tagMap.get(type)[1].toLowerCase()}
+                                onClick={this.setData}
+                            >
+                                {this.tagMap.get(type)[1]}
+                            </Button>
+                        </Col>
+                    </Row>
+                    <Row xs='2' className="pollTagRow">
+                        <Col className="tagBtnCol" >
+                            <Button
+                                color='primary'
+                                value={this.tagMap.get(type)[2].toLowerCase()}
+                                onClick={this.setData}
+                            >
+                                {this.tagMap.get(type)[2]}
+                            </Button>
+                        </Col>
+                        <Col className="tagBtnCol" >
+                            <Button
+                                color='primary'
+                                value={this.tagMap.get(type)[3].toLowerCase()}
+                                onClick={this.setData}
+                            >
+                                {this.tagMap.get(type)[3]}
+                            </Button>
+                        </Col>
+                    </Row>
+                    <Row xs='2' className="pollTagRow">
+                        <Col className="tagBtnCol" >
+                            <Button
+                                color='primary'
+                                value={this.tagMap.get(type)[4].toLowerCase()}
+                                onClick={this.setData}
+                            >
+                                {this.tagMap.get(type)[4]}
+                            </Button>
+                        </Col>
+                        <Col className="tagBtnCol" >
+                            <Button
+                                color='primary'
+                                value={this.tagMap.get(type)[5].toLowerCase()}
+                                onClick={this.setData}
+                            >
+                                {this.tagMap.get(type)[5]}
+                            </Button>
+                        </Col>
+                    </Row>
+                </Container>
+            </div>
+        )
+    }
+}
+
+class NextPlayerPoll extends React.Component {
+    constructor(props) {
+        super(props);
+
+        // binding
+        this.next = this.next.bind(this);
+    }
+
+    next() {
+        if (CURRENT_PLAYER == pollTarget) {
+            this.props.changePage('pollDisplay');
+        } else {
+            this.props.changePage('playerAnon');
+        }
+    }
+
+    render() {
+        return (
+            <div className="nextPlayerPoll">
+                <h4> Pass to </h4>
+                <h1> {playerNameMap.get(CURRENT_PLAYER)} </h1>
+                <Button
+                    className="nextPlayerPollBtn"
+                    color="primary"
+                    onClick={this.next}
+                >
+                    Next
+                    </Button>
+            </div>
+        )
+    }
+}
+
+class PlayerAnon extends React.Component {
+    constructor(props) {
+        super(props);
+
+        // state
+        this.state = { tokens: null }
+
+        // binding
+        this.nextPlayer = this.nextPlayer.bind(this);
+        this.confirm = this.confirm.bind(this);
+    }
+
+    componentDidMount() {
+        fetch(`${SERVER_ADDR}token`, {
+            method: 'POST',
+            mode: 'cors',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ session: SESSION_KEY, id: CURRENT_PLAYER })
+        })
+            .then(async (res) => {
+                const response = await res.json();
+                console.log(`Received token count: ${response}`);
+                console.log(response);
+                this.setState({ tokens: response });
+            })
+            .catch(err => {
+                console.log(err);
+            });
+    }
+
+    confirm() {
+        const anon = pollData.get('anon');
+        pollData.set('anon', anon + 1);
+
+        fetch(`${SERVER_ADDR}token-remove`, {
+            method: 'POST',
+            mode: 'cors',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ session: SESSION_KEY, id: CURRENT_PLAYER })
+        })
+            .then(response => {
+                console.log(`Removed token from player`);
+            })
+            .catch(err => {
+                console.log(err);
+            });
+
+        this.nextPlayer();
+    }
+
+    nextPlayer() {
+        this.props.nextPlayer();
+        this.props.changePage('nextPlayerPoll');
+    }
+
+    render() {
+        if (this.state.tokens === null) {
+            return (
+                <div>
+                    Loading...
+                </div>
+            )
+        } else {
+            return (
+                <div className="playerAnon">
+                    <h1> You have {this.state.tokens} Tokens Left </h1>
+                    <h3> Would you like to use a token for this Poll? </h3>
+                    <Row xs='2' className='confirmBtnRow'>
+                        <Button
+                            className="confirmBtn"
+                            color="primary"
+                            onClick={this.nextPlayer}
+                        >
+                            No
+                        </Button>
+                        <Button
+                            className="confirmBtn"
+                            color="primary"
+                            onClick={this.confirm}
+                         >
+                            Yes
+                        </Button>
+                    </Row>
+                </div>
+            )
+        }
+    }
+}
+
+class PollDisplay extends React.Component {
+    constructor(props) {
+        super(props);
+
+        // state
+        this.state = { data: null }
+
+        // binding
+        this.nextTurn = this.nextTurn.bind(this);
+    }
+
+    componentDidMount() {
+        fetch(`${SERVER_ADDR}poll`, {
+            method: 'POST',
+            mode: 'cors',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ session: SESSION_KEY, id: CURRENT_PLAYER, type: pollData.get('type'), tag: pollData.get('tag') })
+        })
+            .then(res => res.json())
+            .then(response => {
+                console.log("Data Received");
+                console.log(response);
+                this.setState({ data: response });
+            }).catch(err => {
+                console.log(err);
+            });
+    }
+
+    nextTurn() {
+        this.props.nextPlayer();
+        this.props.changePage("nextPlayerTurn");
+    }
+
+    render() {
+        if (this.state.data == null) {
+            return (
+                <div>
+                    Loading...
+                </div>
+            )
+        } else {
+            return (
+                <div className='pollDisplay'>
+                    <h2> Poll Results </h2>
+                    <Row className='dataRow'>
+                        Yes: {this.state.data}
+                    </Row>
+                    <Row className='dataRow'>
+                        No: {NUM_PLAYERS - (this.state.data + pollData.get('anon') + 1)}
+                    </Row>
+                    <Row className='dataRow'>
+                        ???: {pollData.get('anon')}
+                    </Row>
+
+                    <Button
+                        color='primary'
+                        onClick={this.nextTurn}
+                    >
+                        End Turn
+                    </Button>
+                </div>
+            )
+        }
+    }
+}
+
+// ----------------------- Accuse -----------------------
 
 class Accuse extends React.Component {
     render() {
@@ -505,14 +861,17 @@ class Accuse extends React.Component {
                     Loading...
                 </div>
             </div>
-        )
+        );
     }
 }
+
+// ----------------------- End of Game -----------------------
 
 class EndofGame extends React.Component {
     render() {
         return (
             <div>
+                <BackBtn changePage={this.props.changePage} prevPage="playerActionSelect" />
                 <div className="endOfGame">
                     Loading...
                 </div>
@@ -520,6 +879,9 @@ class EndofGame extends React.Component {
         )
     }
 }
+
+
+// ----------------------- End Turn -----------------------
 
 class EndTurnConfirm extends React.Component {
     constructor(props) {
@@ -562,12 +924,12 @@ class EndTurnConfirm extends React.Component {
     }
 }
 
+
+// ----------------------- Main -----------------------
+
 class App extends React.Component {
     constructor(props) {
         super(props);
-
-        // fields
-        this.numPlayers = null;
 
         // binding
         this.reloadPageComponentState = this.reloadPageComponentState.bind(this);
@@ -579,22 +941,37 @@ class App extends React.Component {
         this.loadPlayerNameMap = this.loadPlayerNameMap.bind(this);
 
         // state init
-        this.state = { page: "playerActionSelect", sessionKey: null, playerMapLoaded: true };
+        this.state = { page: "numPlayerSelect", sessionKey: null, playerMapLoaded: false };
 
         // loads PageComponent Map
         this.reloadPageComponentState();
     }
 
     reloadPageComponentState() {
+        console.log("Reloading Componenets");
+
+        // setup pages
         pageComponentMap.set("numPlayerSelect", <NumPlayerSelect changePage={this.changePage} setNumPlayers={this.setNumPlayers} generateSesionKey={this.generateSesionKey} />);
         pageComponentMap.set("caseSetup", <CaseSetup changePage={this.changePage} checkSetupComplete={this.checkSetupComplete} loadPlayerNameMap={this.loadPlayerNameMap} />);
         pageComponentMap.set("nextPlayerSetup", <NextPlayerSetup changePage={this.changePage} nextPlayer={this.nextPlayer} />);
+
+        // main loop
         pageComponentMap.set("nextPlayerTurn", <NextPlayerTurn playerMapLoaded={this.state.playerMapLoaded} changePage={this.changePage} />);
         pageComponentMap.set("playerActionSelect", <PlayerActionSelect changePage={this.changePage} />);
-        pageComponentMap.set("poll", <Poll changePage={this.changePage} />);
-        pageComponentMap.set("accuse", <Accuse changePage={this.changePage} />);
-        pageComponentMap.set("endOfGame", <EndofGame />);
         pageComponentMap.set("endTurnConfirm", <EndTurnConfirm changePage={this.changePage} nextPlayer={this.nextPlayer} />);
+
+        // polling
+        pageComponentMap.set("poll", <Poll changePage={this.changePage} />);
+        pageComponentMap.set("pollTag", <PollTag changePage={this.changePage} nextPlayer={this.nextPlayer} />);
+        pageComponentMap.set('nextPlayerPoll', <NextPlayerPoll changePage={this.changePage} />)
+        pageComponentMap.set('playerAnon', <PlayerAnon changePage={this.changePage} nextPlayer={this.nextPlayer} />)
+        pageComponentMap.set('pollDisplay', <PollDisplay changePage={this.changePage} nextPlayer={this.nextPlayer} />)
+
+        // accuse
+        pageComponentMap.set("accuse", <Accuse changePage={this.changePage} />);
+
+        // game end
+        pageComponentMap.set("endOfGame", <EndofGame />);
 
         this.forceUpdate();
     }
@@ -616,7 +993,8 @@ class App extends React.Component {
     setNumPlayers(n) {
         const parsed = parseInt(n, 10);
         if (!isNaN(parsed)) {
-            this.numPlayers = parsed;
+            console.log(`Set number of players: ${parsed}`);
+            NUM_PLAYERS = parsed;
         } else {
             throw new Error("Number of Players is Not a Number");
         }
@@ -624,14 +1002,14 @@ class App extends React.Component {
 
     nextPlayer() {
         let nextPlayerNum = CURRENT_PLAYER + 1;
-        if (nextPlayerNum >= this.numPlayers) {
+        if (nextPlayerNum >= NUM_PLAYERS) {
             nextPlayerNum = 0;
         }
         CURRENT_PLAYER = nextPlayerNum;
     }
 
     checkSetupComplete() {
-        return (CURRENT_PLAYER >= this.numPlayers - 1)
+        return (CURRENT_PLAYER >= NUM_PLAYERS - 1)
     }
 
     async loadPlayerNameMap() {
@@ -639,7 +1017,7 @@ class App extends React.Component {
         this.reloadPageComponentState();
         let id = 0;
 
-        while (id < this.numPlayers) {
+        while (id < NUM_PLAYERS) {
             const Response = await fetch(`${SERVER_ADDR}name`, {
                 mode: 'cors',
                 method: 'POST',

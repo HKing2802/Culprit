@@ -13,6 +13,9 @@ api = Api(app) #api router
 api.add_resource(CaseSetup,'/case-setup')
 api.add_resource(Session, '/key')
 api.add_resource(PlayerName, '/name')
+api.add_resource(Tokens, '/token')
+api.add_resource(TokenRemove, '/token-remove')
+api.add_resource(Poll, '/poll')
 
 if __name__ == '__main__':
     print("Building Database")

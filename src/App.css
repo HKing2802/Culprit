@@ -74,3 +74,58 @@
     margin-left: 0.4em;
     margin-top: 0.4em;
 }
+
+.poll {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    grid-gap: 1em;
+    margin-top: 3em;
+}
+
+.pollTypeBtn {
+    width: 8em;
+}
+
+.pollTag {
+    margin-top: 3em;
+}
+
+.pollTagRow {
+    margin-top: 1em;
+}
+
+.nextPlayerPoll {
+    padding-top: 2em;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.nextPlayerPollBtn {
+    margin-top: 2em;
+    width: 6em;
+}
+
+.playerAnon {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    grid-gap: 1em;
+}
+
+.confirmBtnRow {
+    grid-gap: 2em;
+}
+
+.pollDisplay {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+}
