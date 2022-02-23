@@ -32,6 +32,12 @@ excludeParser = reqparse.RequestParser()
 excludeParser.add_argument('session')
 excludeParser.add_argument('selected')
 
+accuseParser = reqparse.RequestParser()
+accuseParser.add_argument('session')
+accuseParser.add_argument('id')
+accuseParser.add_argument('player')
+accuseParser.add_argument('color')
+
 # Data Loading
 
 def build_tables():
@@ -60,23 +66,27 @@ class PlayerName(Resource):
 
 class Tokens(Resource):
     def post(self):
-        args = tokenParser.parse_args();
+        args = tokenParser.parse_args()
         return getPlayerTokenCount(args['session'], args['id']), 200
 
 class TokenRemove(Resource):
     def post(self):
-        args = tokenParser.parse_args();
+        args = tokenParser.parse_args()
         removePlayerToken(args['session'], args['id'])
         return {}, 200
 
 class Poll(Resource):
     def post(self):
-        args = pollParser.parse_args();
+        args = pollParser.parse_args()
         return getPollData(args['session'], args['id'], args['type'], args['tag']), 200
 
 class PollExclude(Resource):
     def post(self):
-        args = excludeParser.parse_args();
-        print(args)
+        args = excludeParser.parse_args()
         setPollExcludes(args['session'], args['selected'])
         return {}, 200
+
+class Accuse(Resource):
+    def post(self):
+        args = accuseParser.parse_args()
+        return getAccusationResults(args["session"], args["id"], args["player"], args["color"]), 200
