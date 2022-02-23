@@ -696,7 +696,7 @@ class PollExclude extends React.Component {
                     headers: {
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({ session: SESSION_KEY, selected: this.state.selected })
+                    body: JSON.stringify({ session: SESSION_KEY, id: CURRENT_PLAYER, selected: this.state.selected })
                 })
                     .catch(err => {
                         console.log(err);
@@ -838,6 +838,7 @@ class PlayerAnon extends React.Component {
         // binding
         this.nextPlayer = this.nextPlayer.bind(this);
         this.confirm = this.confirm.bind(this);
+        this.generateYesBtn = this.generateYesBtn.bind(this);
     }
 
     componentDidMount() {
@@ -882,6 +883,31 @@ class PlayerAnon extends React.Component {
         this.nextPlayer();
     }
 
+    generateYesBtn() {
+        if (this.state.tokens > 0) {
+            return (
+                <Button
+                    className="confirmBtn"
+                    color="primary"
+                    onClick={this.confirm}
+                >
+                    Yes
+                </Button>
+            )
+        } else {
+            return (
+                <Button
+                    className="confirmBtn"
+                    color="primary"
+                    disabled
+                    onClick={this.confirm}
+                >
+                    Yes
+                </Button>
+            )
+        }
+    }
+
     nextPlayer() {
         do {
             this.props.nextPlayer();
@@ -910,13 +936,7 @@ class PlayerAnon extends React.Component {
                         >
                             No
                         </Button>
-                        <Button
-                            className="confirmBtn"
-                            color="primary"
-                            onClick={this.confirm}
-                         >
-                            Yes
-                        </Button>
+                        {this.generateYesBtn()}
                     </Row>
                 </div>
             )

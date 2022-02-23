@@ -53,11 +53,15 @@ def getPlayerNameFromId(session, id):
 
 def getPlayerTokenCount(session, id):
     case_id = session + str(id)
-    return exec_get_one("SELECT anon_tokens FROM cases where id=%(cid)s;", {'cid': case_id})
+    data = exec_get_one("SELECT anon_tokens FROM cases where id=%(cid)s;", {'cid': case_id})
+    if (data is not None):
+        return data[0]
+    else:
+        return None
 
 def removePlayerToken(session, id):
     case_id = session + str(id)
-    current_tokens = getPlayerTokenCount(session, id)[0]
+    current_tokens = getPlayerTokenCount(session, id)
     return exec_commit("UPDATE cases SET anon_tokens = %(tokens)s, poll_imm = true WHERE id=%(cid)s;", {'tokens': current_tokens - 1, 'cid': case_id });
 
 def getPollData(session, id, type, tag):
@@ -78,7 +82,8 @@ def getPollData(session, id, type, tag):
     exec_commit("UPDATE cases SET poll_imm = false WHERE session=%(ses)s;", {'ses': session});
     return len(data)
 
-def setPollExcludes(session, selected):
+def setPollExcludes(session, id, selected):
+    removePlayerToken(session, id)
     for s in selected:
         case_id = session + str(s);
         exec_commit("UPDATE cases SET poll_imm = true WHERE id=%(cid)s;", {'cid': case_id});

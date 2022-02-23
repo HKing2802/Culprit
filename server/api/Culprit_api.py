@@ -30,6 +30,7 @@ pollParser.add_argument('tag')
 
 excludeParser = reqparse.RequestParser()
 excludeParser.add_argument('session')
+excludeParser.add_argument('id')
 excludeParser.add_argument('selected')
 
 accuseParser = reqparse.RequestParser()
@@ -89,7 +90,7 @@ class Poll(Resource):
 class PollExclude(Resource):
     def post(self):
         args = excludeParser.parse_args()
-        setPollExcludes(args['session'], args['selected'])
+        setPollExcludes(args['session'], args['id'], args['selected'])
         return {}, 200
 
 class Accuse(Resource):
