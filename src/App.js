@@ -72,39 +72,42 @@ class NumPlayerSelect extends React.Component {
 
     render() {
         return (
-            <div className="numSelectButtons">
-                <h3> Select Number of Players: </h3>
-                <ButtonGroup>
-                    <Button
-                        color="primary"
-                        value="3"
-                        onClick={this.setNumPlayers}
-                    >
-                        3
-                    </Button>
-                    <Button
-                        color="primary"
-                        value="4"
-                        onClick={this.setNumPlayers}
-                    >
-                        4
-                    </Button>
-                    <Button
-                        color="primary"
-                        value="5"
-                        onClick={this.setNumPlayers}
-                    >
-                        5
-                    </Button>
-                    <Button
-                        color="primary"
-                        value="6"
-                        onClick={this.setNumPlayers}
-                    >
-                        6
-                    </Button>
+            <div>
+                <BackBtnLinked />
+                <div className="numSelectButtons">
+                    <h3> Select Number of Players: </h3>
+                    <ButtonGroup>
+                        <Button
+                            color="primary"
+                            value="3"
+                            onClick={this.setNumPlayers}
+                        >
+                            3
+                        </Button>
+                        <Button
+                            color="primary"
+                            value="4"
+                            onClick={this.setNumPlayers}
+                        >
+                            4
+                        </Button>
+                        <Button
+                            color="primary"
+                            value="5"
+                            onClick={this.setNumPlayers}
+                        >
+                            5
+                        </Button>
+                        <Button
+                            color="primary"
+                            value="6"
+                            onClick={this.setNumPlayers}
+                        >
+                            6
+                        </Button>
                     </ButtonGroup>
                 </div>
+            </div>
         )
     }
 }
@@ -1440,6 +1443,101 @@ class EndTurnConfirm extends React.Component {
 }
 
 
+// ----------------------- Load Game -----------------------
+
+function BackBtnLinked() {
+    const navigate = useNavigate();
+
+    function handleNav() {
+        navigate("/");
+    }
+
+    return (
+        <Button
+            className='backBtn'
+            color='primary'
+            onClick={() => handleNav()}
+        >
+            Back
+        </Button>
+    )
+}
+
+class LoadGame extends React.Component {
+    constructor(props) {
+        super(props);
+
+        // state
+        this.state = {session: null}
+
+        // bindings
+        this.updateInfo = this.updateInfo.bind(this);
+        this.loadGame = this.loadGame.bind(this);
+    }
+
+    updateInfo(e) {
+        this.setState({ session: e.target.value });
+    }
+
+    loadGame() {
+        SESSION_KEY = this.state.session;
+
+        fetch(`${SERVER_ADDR}load`, {
+            method: 'POST',
+            mode: 'cors',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ session: SESSION_KEY })
+        })
+            .then(res => res.json())
+            .then(response => {
+                console.log("Game Data Received");
+                console.log(response);
+                this.props.setNumPlayers(response['numPlayers']);
+                this.props.loadPlayerNameMap();
+                CURRENT_PLAYER = 0;
+                this.props.changePage('nextPlayerTurn');
+            }).catch(err => {
+                console.log(err);
+            });
+    }
+
+    render() {
+        return (
+            <div>
+                <BackBtnLinked />
+                <div className='loadGame'>
+                    <Form>
+                        <FormGroup className="loadInput">
+                            <Label for="session">
+                                Session Key
+                            </Label>
+                            <Input
+                                id="session"
+                                name="Session Key"
+                                placeholder="Enter Session Key"
+                                type="text"
+                                onChange={this.updateInfo}
+                            />
+                        </FormGroup>
+                        <FormGroup className="loadSubmit">
+                            <Button
+                                className="caseSubmitBtn"
+                                color='primary'
+                                onClick={this.loadGame}
+                            >
+                                Submit
+                            </Button>
+                        </FormGroup>
+                    </Form>
+                </div>
+            </div>
+        )
+    }
+}
+
+
 // ----------------------- Main -----------------------
 
 class App extends React.Component {
@@ -1456,7 +1554,11 @@ class App extends React.Component {
         this.loadPlayerNameMap = this.loadPlayerNameMap.bind(this);
 
         // state init
-        this.state = { page: "numPlayerSelect", sessionKey: null, playerMapLoaded: false };
+        if (this.props.load) {
+            this.state = { page: "loadGame", sessionKey: null, playerMapLoaded: false };
+        } else {
+            this.state = { page: "numPlayerSelect", sessionKey: null, playerMapLoaded: false };
+        }
 
         // loads PageComponent Map
         this.reloadPageComponentState();
@@ -1468,6 +1570,7 @@ class App extends React.Component {
         pageComponentMap.set("numPlayerSelect", <NumPlayerSelect changePage={this.changePage} setNumPlayers={this.setNumPlayers} generateSesionKey={this.generateSesionKey} />);
         pageComponentMap.set("caseSetup", <CaseSetup changePage={this.changePage} checkSetupComplete={this.checkSetupComplete} loadPlayerNameMap={this.loadPlayerNameMap} nextPlayer={this.nextPlayer} />);
         pageComponentMap.set("nextPlayerSetup", <NextPlayerSetup changePage={this.changePage} nextPlayer={this.nextPlayer} />);
+        pageComponentMap.set("loadGame", <LoadGame changePage={this.changePage} setNumPlayers={this.setNumPlayers} loadPlayerNameMap={this.loadPlayerNameMap} />)
 
         // main loop
         pageComponentMap.set("nextPlayerTurn", <NextPlayerTurn playerMapLoaded={this.state.playerMapLoaded} changePage={this.changePage} />);

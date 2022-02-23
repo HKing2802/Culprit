@@ -41,6 +41,9 @@ accuseParser.add_argument('color')
 endGameCheck = reqparse.RequestParser()
 endGameCheck.add_argument('session')
 
+loadGameParser = reqparse.RequestParser()
+loadGameParser.add_argument('session')
+
 # Data Loading
 
 def build_tables():
@@ -103,3 +106,8 @@ class EndGameData(Resource):
     def post(self):
         args = endGameCheck.parse_args()
         return getEndGameData(args['session']), 200
+
+class LoadGame(Resource):
+    def post(self):
+        args = loadGameParser.parse_args()
+        return getLoadGameData(args['session']), 200

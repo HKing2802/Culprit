@@ -20,6 +20,7 @@ api.add_resource(PollExclude, '/poll-exclude')
 api.add_resource(Accuse, '/accuse')
 api.add_resource(CheckEndGame, '/check-end')
 api.add_resource(EndGameData, '/end')
+api.add_resource(LoadGame, '/load')
 
 if __name__ == '__main__':
     print("Building Database")

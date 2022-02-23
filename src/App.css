@@ -194,3 +194,17 @@
     margin-left: 2em;
     margin-top: 2em;
 }
+
+.loadGame {
+    margin-top: 2em;
+    margin-left: 1em;
+    margin-right: 1em;
+}
+
+.loadSubmit {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    margin-top: 2em;
+}

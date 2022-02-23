@@ -165,3 +165,12 @@ def getEndGameData(session):
         endData[case[0][-1]] = buildPlayerEndData(case[0])
 
     return endData
+
+def getLoadGameData(session):
+    gameData = dict()
+
+    cases = exec_get_all("SELECT id FROM cases WHERE session=%(ses)s;", {'ses': session})
+
+    gameData['numPlayers'] = len(cases)
+
+    return gameData
