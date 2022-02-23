@@ -413,7 +413,6 @@ class PlayerActionSelect extends React.Component {
         // binding
         this.startPoll = this.startPoll.bind(this);
         this.startAccuse = this.startAccuse.bind(this);
-        this.startCheckEndOfGame = this.startCheckEndOfGame.bind(this);
         this.endTurn = this.endTurn.bind(this);
     }
 
@@ -423,10 +422,6 @@ class PlayerActionSelect extends React.Component {
 
     startAccuse() {
         this.props.changePage("accuse");
-    }
-
-    startCheckEndOfGame() {
-        this.props.changePage("endOfGame");
     }
 
     endTurn() {
@@ -451,13 +446,6 @@ class PlayerActionSelect extends React.Component {
                     onClick={this.startAccuse}
                 >
                     Accuse
-                </Button>
-                <Button
-                    className="actionBtn"
-                    color="primary"
-                    onClick={this.startCheckEndOfGame}
-                >
-                    Check for End of Game
                 </Button>
                 <Button
                     className="actionBtn"
@@ -997,6 +985,7 @@ class PollDisplay extends React.Component {
     }
 }
 
+
 // ----------------------- Accuse -----------------------
 
 class Accuse extends React.Component {
@@ -1231,6 +1220,7 @@ class AccuseEndGame extends React.Component {
     }
 }
 
+
 // ----------------------- End of Game -----------------------
 
 class EndofGame extends React.Component {
@@ -1404,8 +1394,6 @@ class EndGameDisplay extends React.Component {
         }
     }
 }
-
-
 
 
 // ----------------------- End Turn -----------------------
