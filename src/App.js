@@ -658,30 +658,38 @@ class PollExclude extends React.Component {
     }
 
     componentDidMount() {
-        fetch(`${SERVER_ADDR}token`, {
-            method: 'POST',
-            mode: 'cors',
-            headers: {
-                'Content-Type': 'application/json'
-            },
-            body: JSON.stringify({ session: SESSION_KEY, id: CURRENT_PLAYER })
-        })
-            .then(async (res) => {
-                const response = await res.json();
-                console.log(`Received token count: ${response}`);
-                console.log(response);
-                this.setState({ tokens: response });
+        if (NUM_PLAYERS <= 3) {
+            this.setData();
+        } else {
+            fetch(`${SERVER_ADDR}token`, {
+                method: 'POST',
+                mode: 'cors',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({ session: SESSION_KEY, id: CURRENT_PLAYER })
             })
-            .catch(err => {
-                console.log(err);
-            });
+                .then(async (res) => {
+                    const response = await res.json();
+                    console.log(`Received token count: ${response}`);
+                    console.log(response);
+                    if (response === 0) {
+                        this.setData();
+                    } else {
+                        this.setState({ tokens: response });
+                    }
+                })
+                .catch(err => {
+                    console.log(err);
+                });
+        }
     }
 
     setData() {
         if (NUM_PLAYERS - (this.state.selected.length + 1) < 2) {
             this.setState({ error: true });
         } else {
-            if (this.state.selected.length >= 0) {
+            if (this.state.selected.length > 0) {
                 fetch(`${SERVER_ADDR}poll-exclude`, {
                     method: 'POST',
                     mode: 'cors',
@@ -762,10 +770,6 @@ class PollExclude extends React.Component {
                     Loading...
                 </div>
             )
-        } else if (this.state.tokens === 0) {
-            this.setData();
-        } else if (NUM_PLAYERS <= 3) {
-            this.setData();
         } else {
             return (
                 <div>
