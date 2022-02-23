@@ -149,6 +149,7 @@ class CaseSetup extends React.Component {
 
         if (this.props.checkSetupComplete()) {
             this.props.loadPlayerNameMap();
+            this.props.nextPlayer();
             this.props.changePage("nextPlayerTurn");
         } else {
             this.props.changePage("nextPlayerSetup");
@@ -1093,11 +1094,10 @@ class App extends React.Component {
     }
 
     reloadPageComponentState() {
-        console.log("Reloading Componenets");
 
         // setup pages
         pageComponentMap.set("numPlayerSelect", <NumPlayerSelect changePage={this.changePage} setNumPlayers={this.setNumPlayers} generateSesionKey={this.generateSesionKey} />);
-        pageComponentMap.set("caseSetup", <CaseSetup changePage={this.changePage} checkSetupComplete={this.checkSetupComplete} loadPlayerNameMap={this.loadPlayerNameMap} />);
+        pageComponentMap.set("caseSetup", <CaseSetup changePage={this.changePage} checkSetupComplete={this.checkSetupComplete} loadPlayerNameMap={this.loadPlayerNameMap} nextPlayer={this.nextPlayer} />);
         pageComponentMap.set("nextPlayerSetup", <NextPlayerSetup changePage={this.changePage} nextPlayer={this.nextPlayer} />);
 
         // main loop
