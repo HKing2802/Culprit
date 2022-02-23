@@ -103,3 +103,65 @@ def getAccusationResults(session, id, player, color):
         return_dict['first'] = False;
         
     return return_dict
+
+def checkEndGame(session):
+    cases = exec_get_all("SELECT id FROM cases WHERE session=%(ses)s;", {"ses": session})
+
+    if (cases is None):
+        print("Unable to get cases from session key")
+        return dict();
+
+    unsolved = 0;
+
+    for case in cases:
+        solves = exec_get_all("SELECT id FROM solves WHERE case_id=%(cid)s;", {"cid": case})
+        if (len(solves) == 0):
+            unsolved += 1
+
+    return (unsolved <= 1)
+
+
+# end game functions
+
+def getCaseColor(case_id):
+    data = exec_get_one("SELECT color FROM cases WHERE id=%(cid)s;", {"cid": case_id})
+    if (data is not None):
+        return data[0]
+    else:
+        return None
+
+def buildPlayerEndData(case_id):
+    data = dict()
+    case_data = exec_get_one("SELECT color, penalties FROM cases WHERE id=%(cid)s;", {"cid": case_id})
+    solves = exec_get_all("SELECT case_id, first FROM solves WHERE player_case=%(cid)s;", {"cid": case_id})
+    first_solve = exec_get_one("SELECT player_case FROM solves WHERE case_id=%(cid)s AND first=true;", {"cid": case_id})
+
+    data['color'] = case_data[0]
+    data['penalties'] = case_data[1]
+
+    if (first_solve is None):
+        data['solved_by'] = -1
+    else:
+        data['solved_by'] = first_solve[0][-1];
+
+    data['solves'] = []
+    for solve in solves:
+        solve_data = dict()
+        solve_data['color'] = getCaseColor(solve[0])
+        solve_data['first'] = solve[1]
+        data['solves'].append(solve_data);
+
+    print("Data Gathered: ", end='')
+    print(data)
+
+    return data
+
+def getEndGameData(session):
+    cases = exec_get_all("SELECT id FROM cases WHERE session=%(ses)s;", {'ses': session})
+
+    endData = dict()
+
+    for case in cases:
+        endData[case[0][-1]] = buildPlayerEndData(case[0])
+
+    return endData

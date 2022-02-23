@@ -1,5 +1,6 @@
 import React from 'react';
 import { ButtonGroup, Button, Navbar, NavbarBrand, NavbarText, Form, FormGroup, Label, Input, Container, Row, Col } from 'reactstrap';
+import { useNavigate } from 'react-router-dom';
 import './App.css';
 
 const pageComponentMap = new Map();
@@ -1110,7 +1111,7 @@ class AccuseDisplay extends React.Component {
 
         // bindings
         this.generateResponse = this.generateResponse.bind(this);
-        this.nextTurn = this.nextTurn.bind(this);
+        this.next = this.next.bind(this);
     }
 
     componentDidMount() {
@@ -1151,16 +1152,16 @@ class AccuseDisplay extends React.Component {
         return resp;
     }
 
-    nextTurn() {
-        this.props.nextPlayer();
-        this.props.changePage("nextPlayerTurn");
+    next() {
+        
+        this.props.changePage("accuseEndGame");
     }
 
     render() {
         if (this.state.correct === null || this.state.first === null) {
             return (
                 <div>
-                    <BackBtn changePage={this.props.changePage} prevPage="playerActionSelect" />
+                    <BackBtn changePage={this.props.changePage} prevPage="accuse" />
                     <div className="accuseDisplay">
                         Loading...
                     </div>
@@ -1174,7 +1175,126 @@ class AccuseDisplay extends React.Component {
                     <Button
                         className='endTurnBtn'
                         color='primary'
-                        onClick={this.nextTurn}
+                        onClick={this.next}
+                    >
+                        Next
+                    </Button>
+                </div>
+            )
+        }
+    }
+}
+
+class AccuseEndGame extends React.Component {
+    constructor(props) {
+        super(props);
+
+        // bindings
+        this.confirm = this.confirm.bind(this);
+        this.endTurn = this.endTurn.bind(this);
+    }
+
+    confirm() {
+        this.props.changePage("endOfGame");
+    }
+
+    endTurn() {
+        this.props.nextPlayer();
+        this.props.changePage("nextPlayerTurn");
+    }
+
+    render() {
+        return (
+            <div>
+                <BackBtn changePage={this.props.changePage} prevPage="accuseDisplay" />
+                <div className="accuseEndGame">
+                    <h2> Would you like to check for End of Game? </h2>
+                    <Row xs='2' className='confirmBtnRow'>
+                        <Button
+                            className="confirmBtn"
+                            color="primary"
+                            onClick={this.endTurn}
+                        >
+                            No
+                        </Button>
+                        <Button
+                            className="confirmBtn"
+                            color="primary"
+                            onClick={this.confirm}
+                        >
+                            Yes
+                        </Button>
+                    </Row>
+                </div>
+            </div>
+        )
+    }
+}
+
+// ----------------------- End of Game -----------------------
+
+class EndofGame extends React.Component {
+    constructor(props) {
+        super(props);
+
+        // state
+        this.state = { result: null };
+
+        // bindings
+        this.endTurn = this.endTurn.bind(this);
+        this.endGame = this.endGame.bind(this);
+    }
+
+    componentDidMount() {
+        fetch(`${SERVER_ADDR}check-end`, {
+            method: 'POST',
+            mode: 'cors',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ session: SESSION_KEY })
+        })
+            .then(res => res.json())
+            .then(response => {
+                if (response === {}) {
+                    console.log("Received null for End Game check");
+                } else if (response === true) {
+                    this.endGame();
+                } else {
+                    this.setState({ result: response });
+                }
+            }).catch(err => {
+                console.log(err);
+            });
+    }
+
+    endTurn() {
+        this.props.nextPlayer();
+        this.props.changePage("nextPlayerTurn");
+    }
+
+    endGame() {
+        this.props.changePage("endGameDisplay");
+    }
+
+    render() {
+        if (this.state.result === null) {
+            return (
+                <div>
+                    <BackBtn changePage={this.props.changePage} prevPage="accuseEndGame" />
+                    <div className="endOfGame">
+                        Loading...
+                    </div>
+                </div>
+            )
+        } else {
+            return (
+                <div className="endOfGame">
+                    <h5> There is not enough cases solved to end the game </h5>
+                    <p> Correctly accuse more players to end the game! </p>
+                    <Button
+                        color="primary"
+                        onClick={this.endTurn}
                     >
                         End Turn
                     </Button>
@@ -1184,20 +1304,108 @@ class AccuseDisplay extends React.Component {
     }
 }
 
-// ----------------------- End of Game -----------------------
+function MainMenuBtn() {
+    const navigate = useNavigate();
 
-class EndofGame extends React.Component {
-    render() {
-        return (
-            <div>
-                <BackBtn changePage={this.props.changePage} prevPage="playerActionSelect" />
-                <div className="endOfGame">
-                    Loading...
+    function handleNav() {
+        navigate("/");
+    }
+
+    return (
+        <Button
+            className='returnMenuBtn'
+            color='primary'
+            onClick={() => handleNav()}
+        >
+            Main Menu
+        </Button>
+    )
+}
+
+class EndGameDisplay extends React.Component {
+    constructor(props) {
+        super(props);
+
+        // state
+        this.state = { data: null };
+
+        // bindings
+        this.generatePlayerReports = this.generatePlayerReports.bind(this);
+    }
+
+    componentDidMount() {
+        fetch(`${SERVER_ADDR}end`, {
+            method: 'POST',
+            mode: 'cors',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ session: SESSION_KEY })
+        })
+            .then(res => res.json())
+            .then(response => {
+                console.log("End Game Data Received");
+                console.log(response);
+                this.setState({ data: response });
+            }).catch(err => {
+                console.log(err);
+            });
+    }
+
+    generatePlayerReports() {
+        const reports = [];
+
+        for (let i = 0; i < NUM_PLAYERS; i++) {
+            const pData = this.state.data[i];
+            const pSolves = pData['solves']
+            let solved = "Cases Solved: "
+            for (let i = 0; i < pSolves.length; i++) {
+                solved += pSolves[i]['color'];
+                if (pSolves[i]['first']) {
+                    solved += " (first)";
+                }
+                if (i + 1 !== pSolves.length) {
+                    solved += ", ";
+                }
+            }
+
+            reports.push(
+                <div className="playerReport">
+                    <p><b>{playerNameMap.get(i)}: </b> <br />
+                    Crime: {pData['color']} <br />
+                    First Solved By: {pData['solved_by'] === -1 ? "[NONE]" : playerNameMap.get(parseInt(pData['solved_by']))}</p>
+                    <hr />
+                    <p>Incorrect Guesses: {pData['penalties']} <br />
+                    {solved}</p>
                 </div>
-            </div>
-        )
+            )
+        }
+
+        return reports;
+    }
+
+    render() {
+        if (this.state.data === null) {
+            return (
+                <div>
+                    <div className="endGameDisplay">
+                        Loading End Game...
+                    </div>
+                </div>
+            )
+        } else {
+            return (
+                <div className="endGameDisplay">
+                    <h1> Game Over </h1>
+                    {this.generatePlayerReports()}
+                    <MainMenuBtn />
+                </div>
+            )
+        }
     }
 }
+
+
 
 
 // ----------------------- End Turn -----------------------
@@ -1288,10 +1496,12 @@ class App extends React.Component {
 
         // accuse
         pageComponentMap.set("accuse", <Accuse changePage={this.changePage} />);
-        pageComponentMap.set("accuseDisplay", <AccuseDisplay changePage={this.changePage} nextPlayer={this.nextPlayer} />)
+        pageComponentMap.set("accuseDisplay", <AccuseDisplay changePage={this.changePage} />)
+        pageComponentMap.set("accuseEndGame", <AccuseEndGame changePage={this.changePage} nextPlayer={this.nextPlayer} />)
 
         // game end
-        pageComponentMap.set("endOfGame", <EndofGame />);
+        pageComponentMap.set("endOfGame", <EndofGame changePage={this.changePage} nextPlayer={this.nextPlayer} />);
+        pageComponentMap.set("endGameDisplay", <EndGameDisplay />)
 
         this.forceUpdate();
     }

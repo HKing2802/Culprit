@@ -119,7 +119,7 @@
 }
 
 .confirmBtnRow {
-    grid-gap: 2em;
+    grid-gap: 4em;
 }
 
 .pollDisplay {
@@ -168,4 +168,29 @@
     text-align: center;
     grid-gap: 0.5em;
     margin-top: 0.8em;
+}
+
+.accuseEndGame {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    grid-gap: 1em;
+    margin-top: 2em;
+}
+
+.endOfGame {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    grid-gap: 1em;
+    margin-top: 2em;
+}
+
+.endGameDisplay {
+    margin-left: 2em;
+    margin-top: 2em;
 }
