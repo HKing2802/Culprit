@@ -69,10 +69,15 @@ def getPollData(session, id, type, tag):
         data = exec_get_all("SELECT cases.id FROM cases INNER JOIN locations ON cases.location_id=locations.id WHERE cases.id!=%(cid)s AND cases.session=%(ses)s AND cases.poll_imm=false AND (locations.tag1=%(tag)s OR locations.tag2=%(tag)s);",
                             {'cid': exc_case_id, 'tag': tag, 'ses': session});
     else:
-        data = exec_get_all("SELECT cases.id FROM cases INNER JOIN weapons ON cases.weapon_id=weapons.id WHERE cases.id!=%(cid)s AND cases.session=%(ses)s AND cases.poll_imm=false AND (weapon.tag1=%(tag)s OR weapon.tag2=%(tag)s);",
+        data = exec_get_all("SELECT cases.id FROM cases INNER JOIN victims ON cases.victim_id=victims.id WHERE cases.id!=%(cid)s AND cases.session=%(ses)s AND cases.poll_imm=false AND (victims.tag1=%(tag)s OR victims.tag2=%(tag)s);",
                             {'cid': exc_case_id, 'tag': tag, 'ses': session});
 
     # clear poll immunities
     exec_commit("UPDATE cases SET poll_imm = false WHERE session=%(ses)s;", {'ses': session});
     print(data)
     return len(data)
+
+def setPollExcludes(session, selected):
+    for s in selected:
+        case_id = session + str(s);
+        exec_commit("UPDATE cases SET poll_imm = true WHERE id=%(cid)s;", {'cid': case_id});
