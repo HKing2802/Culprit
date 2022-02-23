@@ -1,5 +1,6 @@
 import React from 'react';
 import { Container, Navbar, NavbarBrand, Row, Col, Button } from 'reactstrap';
+import { useNavigate } from 'react-router-dom';
 import './landing.css';
 
 class Header extends React.Component {
@@ -26,7 +27,7 @@ class Desc extends React.Component {
             <Container>
                 <Row>
                     <Col className="bg-light border">
-                        The year is 2107. Prisoners awaiting trial for murder in Lockhurst Prison wake up to a knock and find a note, containing a deal. 
+                        The year is 2025. Prisoners awaiting trial for murder in Lockhurst Prison wake up to a knock and find a note, containing a deal. 
                         Out of a lack of workforce and care, the prisoners have been grouped up to solve each other's crimes. The deal: the prisoner who helps the police solve the most cases goes free. 
                         Linked by a shared computer system, each criminal has one goal: outwit the other prisoners, hide their own case's details, and find every case's true Culprit.
                     </Col>
@@ -36,6 +37,24 @@ class Desc extends React.Component {
     }
 }
 
+function NewGameBtn() {
+    const navigate = useNavigate();
+
+    function handleNav() {
+        navigate("/game");
+    }
+
+    return (
+        <Button
+            className='newGameButton'
+            color='primary'
+            onClick={() => handleNav()}
+        >
+            New Game
+        </Button>
+    )
+}
+
 class Landing extends React.Component {
     render() {
         return (
@@ -43,12 +62,7 @@ class Landing extends React.Component {
                 <Header />
                 <Desc />
                 <div className="startButtons">
-                    <Button
-                        className="newGameButton"
-                        color="primary"
-                    >
-                        New Game
-                    </Button>
+                    <NewGameBtn />
                     <Button
                         className="resumeGameButton"
                         color="primary"
