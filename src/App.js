@@ -15,7 +15,7 @@ const accuseData = new Map();
 // playerNameMap.set(0, "Adam");
 // --------------------------------
 
-const SERVER_ADDR = "http://localhost:5000/"
+const SERVER_ADDR = "http://98.10.41.100:5000/"
 
 let CURRENT_PLAYER = 0;
 let SESSION_KEY = null;
@@ -779,7 +779,7 @@ class PollExclude extends React.Component {
                         <p> You may choose to exclude no one </p>
                         <p> It costs 1 Anonymous token to exclude any number of players </p>
                         <p> You have {this.state.tokens} Anonymous tokens remaining </p>
-                        {this.state.error ? (<p className='err'> You must poll at lest two people </p>) : null}
+                        {this.state.error ? (<p className='err'> You must poll at least two people </p>) : null}
                         {this.generatePlayerBtns()}
                         <Button
                             className='excludeSubmitBtn'
