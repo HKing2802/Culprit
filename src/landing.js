@@ -55,6 +55,24 @@ function NewGameBtn() {
     )
 }
 
+function ResumeGameBtn() {
+    const navigate = useNavigate();
+
+    function handleNav() {
+        navigate("/game-resume");
+    }
+
+    return (
+        <Button
+            className='resumeGameButton'
+            color='primary'
+            onClick={() => handleNav()}
+        >
+            Resume Game
+        </Button>
+    )
+}
+
 class Landing extends React.Component {
     render() {
         return (
@@ -63,12 +81,7 @@ class Landing extends React.Component {
                 <Desc />
                 <div className="startButtons">
                     <NewGameBtn />
-                    <Button
-                        className="resumeGameButton"
-                        color="primary"
-                    >
-                        Resume Game
-                    </Button>
+                    <ResumeGameBtn />
                 </div>
             </div>
         )
