@@ -566,11 +566,8 @@ class PollTag extends React.Component {
 
     setData(e) {
         pollData.set('tag', e.target.value);
-        pollData.set('anon', 0);
-        pollTarget = CURRENT_PLAYER;
 
-        this.props.nextPlayer();
-        this.props.changePage("nextPlayerPoll");
+        this.props.changePage("pollExclude");
     }
 
     render() {
@@ -653,6 +650,151 @@ class PollTag extends React.Component {
                 </Container>
             </div>
         )
+    }
+}
+
+class PollExclude extends React.Component {
+    constructor(props) {
+        super(props);
+
+        // state
+        this.state = {selected: [], tokens: null, error: false}
+
+        // bindings
+        this.setData = this.setData.bind(this);
+        this.updateSelected = this.updateSelected.bind(this);
+        this.generatePlayerBtns = this.generatePlayerBtns.bind(this);
+    }
+
+    componentDidMount() {
+        fetch(`${SERVER_ADDR}token`, {
+            method: 'POST',
+            mode: 'cors',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ session: SESSION_KEY, id: CURRENT_PLAYER })
+        })
+            .then(async (res) => {
+                const response = await res.json();
+                console.log(`Received token count: ${response}`);
+                console.log(response);
+                this.setState({ tokens: response });
+            })
+            .catch(err => {
+                console.log(err);
+            });
+    }
+
+    setData() {
+        if (NUM_PLAYERS - (this.state.selected.length + 1) < 2) {
+            this.setState({ error: true });
+        } else {
+            if (this.state.selected.length >= 0) {
+                fetch(`${SERVER_ADDR}poll-exclude`, {
+                    method: 'POST',
+                    mode: 'cors',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ session: SESSION_KEY, selected: this.state.selected })
+                })
+                    .catch(err => {
+                        console.log(err);
+                    });
+            }
+
+            pollData.set('excluded', this.state.selected);
+            pollData.set('anon', 0);
+            pollTarget = CURRENT_PLAYER;
+
+            do {
+                this.props.nextPlayer();
+            } while (pollData.get('excluded').includes(CURRENT_PLAYER));
+
+            this.props.changePage('nextPlayerPoll');
+        }
+    }
+
+    updateSelected(e) {
+        let newSel;
+        if (this.state.selected.includes(parseInt(e.target.value))) {
+            newSel = this.state.selected.filter((value, index, arr) => {
+                return value !== parseInt(e.target.value);
+            })
+        } else {
+            newSel = this.state.selected;
+            newSel.push(parseInt(e.target.value));
+        }
+        this.setState({ selected: newSel });
+    }
+
+    generatePlayerBtns() {
+        let btns = []
+
+        for (let i = 0; i < NUM_PLAYERS; i++) {
+            if (i !== CURRENT_PLAYER) {
+                if (this.state.selected.includes(i)) {
+                    btns.push(
+                        <Button
+                            className='playerExcludeBtn'
+                            color="primary"
+                            value={i}
+                            onClick={this.updateSelected}
+                        >
+                            {playerNameMap.get(i)}
+                        </Button>
+                    );
+                } else {
+                    btns.push(
+                        <Button
+                            className='playerExcludeBtn'
+                            color="primary"
+                            outline
+                            value={i}
+                            onClick={this.updateSelected}
+                        >
+                            {playerNameMap.get(i)}
+                        </Button>
+                    );
+                }
+            }
+        }
+
+        return btns;
+    }
+
+    render() {
+        if (this.state.tokens === null) {
+            return (
+                <div>
+                    Loading...
+                </div>
+            )
+        } else if (this.state.tokens === 0) {
+            this.setData();
+        } else {
+            return (
+                <div>
+                    <BackBtn changePage={this.props.changePage} prevPage="playerActionSelect" />
+                    <div className="pollExclude">
+                        <h2> Select Players to Exclude </h2>
+                        <p> You may choose to exclude no one </p>
+                        <p> It costs 1 Anonymous token to exclude any number of players </p>
+                        <p> You have {this.state.tokens} Anonymous tokens remaining </p>
+                        {this.state.error ? (<p className='err'> You must poll at lest two people </p>) : null}
+                        {this.generatePlayerBtns()}
+                        <Button
+                            className='excludeSubmitBtn'
+                            color='primary'
+                            onClick={this.setData}
+                        >
+                            Done
+                        </Button>
+                    </div>
+                </div>
+            )
+        }
     }
 }
 
@@ -744,7 +886,10 @@ class PlayerAnon extends React.Component {
     }
 
     nextPlayer() {
-        this.props.nextPlayer();
+        do {
+            this.props.nextPlayer();
+        } while (pollData.get('excluded').includes(CURRENT_PLAYER));
+
         this.props.changePage('nextPlayerPoll');
     }
 
@@ -832,7 +977,7 @@ class PollDisplay extends React.Component {
                         Yes: {this.state.data}
                     </Row>
                     <Row className='dataRow'>
-                        No: {NUM_PLAYERS - (this.state.data + pollData.get('anon') + 1)}
+                        No: {NUM_PLAYERS - (this.state.data + pollData.get('anon') + pollData.get('excluded').length + 1)}
                     </Row>
                     <Row className='dataRow'>
                         ???: {pollData.get('anon')}
@@ -962,7 +1107,8 @@ class App extends React.Component {
 
         // polling
         pageComponentMap.set("poll", <Poll changePage={this.changePage} />);
-        pageComponentMap.set("pollTag", <PollTag changePage={this.changePage} nextPlayer={this.nextPlayer} />);
+        pageComponentMap.set("pollTag", <PollTag changePage={this.changePage} />);
+        pageComponentMap.set("pollExclude", <PollExclude changePage={this.changePage} nextPlayer={this.nextPlayer} />)
         pageComponentMap.set('nextPlayerPoll', <NextPlayerPoll changePage={this.changePage} />)
         pageComponentMap.set('playerAnon', <PlayerAnon changePage={this.changePage} nextPlayer={this.nextPlayer} />)
         pageComponentMap.set('pollDisplay', <PollDisplay changePage={this.changePage} nextPlayer={this.nextPlayer} />)

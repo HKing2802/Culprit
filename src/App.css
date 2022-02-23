@@ -129,3 +129,25 @@
     align-items: center;
     text-align: center;
 }
+
+.pollExclude {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    grid-gap: 0.5em;
+    margin-top: 0.4em;
+}
+
+.playerExcludeBtn {
+    margin-top: 1em;
+}
+
+.excludeSubmitBtn {
+    margin-top: 1em;
+}
+
+.err {
+    color: red;
+}
