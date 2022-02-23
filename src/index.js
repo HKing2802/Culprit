@@ -12,6 +12,7 @@ ReactDOM.render(
             <Routes>
                 <Route path="/" element={<Landing />} />
                 <Route path="/game" element={<App />} />
+                <Route path="/game-resume" element={<App load />} />
             </Routes>
         </Router>
     </React.StrictMode>,
