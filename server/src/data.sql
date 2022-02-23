@@ -1,33 +1,33 @@
 
 INSERT INTO weapons (id, name, tag1, tag2) VALUES
-	(1, 'pistol', 'One-Handed', 'Ranged'),
-	(2, 'sword', 'One-Handed', 'Sharp'),
-	(3, 'hammer', 'One-Handed', 'Blunt'),
-	(4, 'rifle', 'Two-Handed', 'Ranged'),
-	(5, 'battle axe', 'Two-Handed', 'Sharp'),
-	(6, 'bat', 'Two-Handed', 'Blunt'),
-	(7, 'dart', 'Quick', 'Ranged'),
-	(8, 'dagger', 'Quick', 'Sharp'),
-	(9, 'rock', 'Quick', 'Blunt');
+	(1, 'pistol', 'one-handed', 'ranged'),
+	(2, 'sword', 'one-handed', 'sharp'),
+	(3, 'hammer', 'one-handed', 'blunt'),
+	(4, 'rifle', 'two-handed', 'ranged'),
+	(5, 'battle axe', 'two-handed', 'sharp'),
+	(6, 'bat', 'two-handed', 'blunt'),
+	(7, 'dart', 'quick', 'ranged'),
+	(8, 'dagger', 'quick', 'sharp'),
+	(9, 'rock', 'quick', 'blunt');
 
 INSERT INTO locations (id, name, tag1, tag2) VALUES
-	(1, 'shed', 'Exterior', 'Core'),
-	(2, 'pool', 'Exterior', 'Leisure'),
-	(3, 'shooting range', 'Exterior', 'Occupational'),
-	(4, 'kitchen', 'Interior', 'Core'),
-	(5, 'library', 'Interior', 'Leisure'),
-	(6, 'office', 'Interior', 'Occupational'),
-	(7, 'storage Room', 'Underground', 'Core'),
-	(8, 'theater', 'Underground', 'Leisure'),
-	(9, 'workshop', 'Underground', 'Occupational');
+	(1, 'shed', 'exterior', 'core'),
+	(2, 'pool', 'exterior', 'leisure'),
+	(3, 'shooting range', 'exterior', 'occupational'),
+	(4, 'kitchen', 'interior', 'core'),
+	(5, 'library', 'interior', 'leisure'),
+	(6, 'office', 'interior', 'occupational'),
+	(7, 'storage room', 'underground', 'core'),
+	(8, 'theater', 'underground', 'leisure'),
+	(9, 'workshop', 'underground', 'occupational');
 
 INSERT INTO victims (id, name, tag1, tag2) VALUES
-	(1, 'Nora Perez', 'Retired', 'Lower-Class'),
-	(2, 'Emmett Parker', 'Retired', 'Middle-Class'),
-	(3, 'Arturo Elliot', 'Retired', 'Upper-Class'),
-	(4, 'Scott Walters', 'Student', 'Lower-Class'),
-	(5, 'Estelle Woods', 'Student', 'Middle-Class'),
-	(6, 'Warren Fisher', 'Student', 'Upper-Class'),
-	(7, 'Earl Daniels', 'Working', 'Lower-Class'),
-	(8, 'Stephanie McBride', 'Working', 'Middle-Class'),
-	(9, 'Gregg Washington', 'Working', 'Upper-Class');
+	(1, 'Nora Perez', 'retired', 'lower-class'),
+	(2, 'Emmett Parker', 'retired', 'middle-class'),
+	(3, 'Arturo Elliot', 'retired', 'upper-class'),
+	(4, 'Scott Walters', 'student', 'lower-class'),
+	(5, 'Estelle Woods', 'student', 'middle-class'),
+	(6, 'Warren Fisher', 'student', 'upper-class'),
+	(7, 'Earl Daniels', 'working', 'lower-class'),
+	(8, 'Stephanie McBride', 'working', 'middle-class'),
+	(9, 'Gregg Washington', 'working', 'upper-class');

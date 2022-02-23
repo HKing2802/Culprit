@@ -17,7 +17,9 @@ CREATE TABLE cases (
 	color		VARCHAR(10) NOT NULL,
 	weapon_id	INT NOT NULL,
 	victim_id	INT NOT NULL,
-	location_id	INT NOT NULL
+	location_id	INT NOT NULL,
+	anon_tokens INT NOT NULL,
+	poll_imm	BOOLEAN DEFAULT false
 );
 
 CREATE TABLE solved (
