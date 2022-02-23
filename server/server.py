@@ -16,6 +16,7 @@ api.add_resource(PlayerName, '/name')
 api.add_resource(Tokens, '/token')
 api.add_resource(TokenRemove, '/token-remove')
 api.add_resource(Poll, '/poll')
+api.add_resource(PollExclude, '/poll-exclude')
 
 if __name__ == '__main__':
     print("Building Database")
@@ -23,4 +24,4 @@ if __name__ == '__main__':
     print("Loading Data")
     load_game_data()
     print("Starting Flask")
-    app.run(debug=True), #starts Flask
+    app.run(debug=True, host="0.0.0.0"), #starts Flask

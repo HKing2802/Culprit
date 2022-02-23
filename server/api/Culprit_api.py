@@ -28,6 +28,10 @@ pollParser.add_argument('id')
 pollParser.add_argument('type')
 pollParser.add_argument('tag')
 
+excludeParser = reqparse.RequestParser()
+excludeParser.add_argument('session')
+excludeParser.add_argument('selected')
+
 # Data Loading
 
 def build_tables():
@@ -69,3 +73,10 @@ class Poll(Resource):
     def post(self):
         args = pollParser.parse_args();
         return getPollData(args['session'], args['id'], args['type'], args['tag']), 200
+
+class PollExclude(Resource):
+    def post(self):
+        args = excludeParser.parse_args();
+        print(args)
+        setPollExcludes(args['session'], args['selected'])
+        return {}, 200
