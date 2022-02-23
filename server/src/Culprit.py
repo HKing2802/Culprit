@@ -45,7 +45,11 @@ def generateSessionKey(size=5):
 
 def getPlayerNameFromId(session, id):
     case_id = session + str(id)
-    return exec_get_one("SELECT player_name FROM cases WHERE id=%(cid)s;", {'cid': case_id})
+    data = exec_get_one("SELECT player_name FROM cases WHERE id=%(cid)s;", {'cid': case_id})
+    if (data is not None):
+        return data[0]
+    else:
+        return None
 
 def getPlayerTokenCount(session, id):
     case_id = session + str(id)
@@ -59,8 +63,6 @@ def removePlayerToken(session, id):
 def getPollData(session, id, type, tag):
     exc_case_id = session + str(id);
     
-    print("looking for " + type + " | " + tag)
-
     data = None
     if (type == "weapon"):
         data = exec_get_all("SELECT cases.id FROM cases INNER JOIN weapons ON cases.weapon_id=weapons.id WHERE cases.id!=%(cid)s AND cases.session=%(ses)s AND cases.poll_imm=false AND (weapons.tag1=%(tag)s OR weapons.tag2=%(tag)s);",
@@ -74,10 +76,30 @@ def getPollData(session, id, type, tag):
 
     # clear poll immunities
     exec_commit("UPDATE cases SET poll_imm = false WHERE session=%(ses)s;", {'ses': session});
-    print(data)
     return len(data)
 
 def setPollExcludes(session, selected):
     for s in selected:
         case_id = session + str(s);
         exec_commit("UPDATE cases SET poll_imm = true WHERE id=%(cid)s;", {'cid': case_id});
+
+def getAccusationResults(session, id, player, color):
+    case_id = session + str(id)
+    p_case = session + str(player)
+
+    p_case_color = exec_get_one("SELECT color FROM cases WHERE id=%(cid)s;", {"cid": p_case})[0]
+
+    return_dict = dict()
+    
+    if (p_case_color == color):
+        solves = exec_get_all("SELECT id FROM solves WHERE case_id=%(cid)s;", {"cid": p_case})
+        exec_commit("INSERT INTO solves (case_id, player_case, first) VALUES (%(cid)s, %(pcid)s, %(first)s);", {"cid": p_case, "pcid": case_id, "first": len(solves) == 0})
+        return_dict['correct'] = True;
+        return_dict['first'] = len(solves) == 0
+    else:
+        penalties = exec_get_one("SELECT penalties FROM cases WHERE id=%(cid)s;", {"cid": case_id})[0]
+        exec_commit("UPDATE cases SET penalties=%(p)s WHERE id=%(cid)s;", {"cid": case_id, "p": penalties + 1})
+        return_dict['correct'] = False;
+        return_dict['first'] = False;
+        
+    return return_dict
