@@ -1,6 +1,6 @@
 DROP TABLE IF EXISTS cases;
 DROP TABLE IF EXISTS sessions;
-DROP TABLE IF EXISTS solved;
+DROP TABLE IF EXISTS solves;
 DROP TABLE IF EXISTS weapons;
 DROP TABLE IF EXISTS victims;
 DROP TABLE IF EXISTS locations;
@@ -19,13 +19,14 @@ CREATE TABLE cases (
 	victim_id	INT NOT NULL,
 	location_id	INT NOT NULL,
 	anon_tokens INT NOT NULL,
-	poll_imm	BOOLEAN DEFAULT false
+	poll_imm	BOOLEAN DEFAULT false,
+	penalties	INT NOT NULL DEFAULT 0
 );
 
-CREATE TABLE solved (
+CREATE TABLE solves (
 	id			BIGSERIAL PRIMARY KEY,
-	case_id		BIGINT NOT NULL,
-	player_name	VARCHAR(50) NOT NULL,
+	case_id		VARCHAR(6) NOT NULL,
+	player_case	VARCHAR(6) NOT NULL,
 	first		BOOLEAN
 );
 
