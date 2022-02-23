@@ -8,6 +8,8 @@ const playerNameMap = new Map();
 const pollData = new Map();
 let pollTarget = null;
 
+const accuseData = new Map();
+
 // ----------- DEV TEMP -----------
 // playerNameMap.set(0, "Adam");
 // --------------------------------
@@ -32,10 +34,6 @@ class HeaderSession extends React.Component {
 }
 
 class Header extends React.Component {
-    constructor(props) {
-        super(props);
-    }
-
     render() {
         return (
             <div className="header">
@@ -774,6 +772,8 @@ class PollExclude extends React.Component {
             )
         } else if (this.state.tokens === 0) {
             this.setData();
+        } else if (NUM_PLAYERS <= 3) {
+            this.setData();
         } else {
             return (
                 <div>
@@ -808,7 +808,7 @@ class NextPlayerPoll extends React.Component {
     }
 
     next() {
-        if (CURRENT_PLAYER == pollTarget) {
+        if (CURRENT_PLAYER === pollTarget) {
             this.props.changePage('pollDisplay');
         } else {
             this.props.changePage('playerAnon');
@@ -999,15 +999,188 @@ class PollDisplay extends React.Component {
 // ----------------------- Accuse -----------------------
 
 class Accuse extends React.Component {
+    constructor(props) {
+        super(props);
+
+        // bindings
+        this.generatePlayerOptions = this.generatePlayerOptions.bind(this);
+        this.updateInfo = this.updateInfo.bind(this);
+        this.nextPage = this.nextPage.bind(this);
+    }
+
+    componentDidMount() {
+        accuseData.clear();
+    }
+
+    generatePlayerOptions() {
+        let options = []
+
+        for (let i = 0; i < NUM_PLAYERS; i++) {
+            if (i !== CURRENT_PLAYER) {
+                options.push(
+                    <option value={i}>
+                        {playerNameMap.get(i)}
+                    </option>
+                    )
+            }
+        }
+
+        return options;
+    }
+
+    updateInfo(e) {
+        accuseData.set(e.target.id, e.target.value);
+    }
+
+    nextPage() {
+        this.props.changePage("accuseDisplay");
+    }
+
     render() {
         return (
             <div>
                 <BackBtn changePage={this.props.changePage} prevPage="playerActionSelect" />
                 <div className="accuse">
-                    Loading...
+                    <h1> Accuse </h1>
+                    <Form>
+                        <FormGroup className="accuseInput">
+                            <Label for="player">
+                                Player
+                            </Label>
+                            <Input
+                                id="player"
+                                name="Accuse Player"
+                                type="select"
+                                onChange={this.updateInfo}
+                            >
+                                <option selected hidden />
+                                {this.generatePlayerOptions()}
+                            </Input>
+                        </FormGroup>
+                        <FormGroup className="accuseInput">
+                            <Label for="color">
+                                Color
+                            </Label>
+                            <Input
+                                id="color"
+                                name="Accuse Color"
+                                type="select"
+                                onChange={this.updateInfo}
+                            >
+                                <option selected hidden />
+                                <option value="red">
+                                    Red
+                                </option>
+                                <option value="orange">
+                                    Orange
+                                </option>
+                                <option value="yellow">
+                                    Yellow
+                                </option>
+                                <option value="green">
+                                    Green
+                                </option>
+                                <option value="blue">
+                                    Blue
+                                </option>
+                                <option value="purple">
+                                    Purple
+                                </option>
+                            </Input>
+                        </FormGroup>
+                        <Button
+                            color='primary'
+                            onClick={this.nextPage}
+                        >
+                            Submit
+                        </Button>
+                    </Form>
                 </div>
             </div>
         );
+    }
+}
+
+class AccuseDisplay extends React.Component {
+    constructor(props) {
+        super(props);
+
+        // state
+        this.state = {correct: null, first: null}
+
+        // bindings
+        this.generateResponse = this.generateResponse.bind(this);
+        this.nextTurn = this.nextTurn.bind(this);
+    }
+
+    componentDidMount() {
+        fetch(`${SERVER_ADDR}accuse`, {
+            method: 'POST',
+            mode: 'cors',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ session: SESSION_KEY, id: CURRENT_PLAYER, player: accuseData.get('player'), color: accuseData.get('color') })
+        })
+            .then(res => res.json())
+            .then(response => {
+                this.setState({ correct: response.correct, first: response.first });
+            }).catch(err => {
+                console.log(err);
+            });
+    }
+
+    generateResponse() {
+        let resp = []
+
+        const targetName = playerNameMap.get(parseInt(accuseData.get('player')));
+
+        resp.push(<p> You Accused {targetName} of being {accuseData.get('color')}. </p>);
+
+        if (this.state.correct) {
+            resp.push(<p className="correct"> You are Correct </p>)
+            if (this.state.first) {
+                resp.push(<p className="correct"> You are the first to correctly accuse this player </p>);
+            } else {
+                resp.push(<p className="incorrect"> You are not the first to correctly accuse this player </p>);
+            }
+        } else {
+            resp.push(<p className="incorrect"> You are Incorrect </p>);
+        }
+
+        return resp;
+    }
+
+    nextTurn() {
+        this.props.nextPlayer();
+        this.props.changePage("nextPlayerTurn");
+    }
+
+    render() {
+        if (this.state.correct === null || this.state.first === null) {
+            return (
+                <div>
+                    <BackBtn changePage={this.props.changePage} prevPage="playerActionSelect" />
+                    <div className="accuseDisplay">
+                        Loading...
+                    </div>
+                </div>
+            )
+        } else {
+            return (
+                <div className="accuseDisplay">
+                    <h1> Accuse </h1>
+                    {this.generateResponse()}
+                    <Button
+                        className='endTurnBtn'
+                        color='primary'
+                        onClick={this.nextTurn}
+                    >
+                        End Turn
+                    </Button>
+                </div>
+            )
+        }
     }
 }
 
@@ -1115,6 +1288,7 @@ class App extends React.Component {
 
         // accuse
         pageComponentMap.set("accuse", <Accuse changePage={this.changePage} />);
+        pageComponentMap.set("accuseDisplay", <AccuseDisplay changePage={this.changePage} nextPlayer={this.nextPlayer} />)
 
         // game end
         pageComponentMap.set("endOfGame", <EndofGame />);

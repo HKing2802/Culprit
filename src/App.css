@@ -151,3 +151,21 @@
 .err {
     color: red;
 }
+
+.correct {
+    color: green;
+}
+
+.incorrect {
+    color: red;
+}
+
+.accuseDisplay {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    grid-gap: 0.5em;
+    margin-top: 0.8em;
+}
