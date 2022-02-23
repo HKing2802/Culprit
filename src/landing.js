@@ -1,5 +1,5 @@
 import React from 'react';
-import { Container, Navbar, NavbarBrand, Row, Col, Button, ButtonGroup } from 'reactstrap';
+import { Container, Navbar, NavbarBrand, Row, Col, Button } from 'reactstrap';
 import './landing.css';
 
 class Header extends React.Component {
