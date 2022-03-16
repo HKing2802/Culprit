@@ -1,25 +1,25 @@
 
 INSERT INTO weapons (id, name, tag1, tag2) VALUES
-	(1, 'pistol', 'one-handed', 'ranged'),
-	(2, 'sword', 'one-handed', 'sharp'),
-	(3, 'hammer', 'one-handed', 'blunt'),
-	(4, 'rifle', 'two-handed', 'ranged'),
-	(5, 'battle axe', 'two-handed', 'sharp'),
-	(6, 'bat', 'two-handed', 'blunt'),
-	(7, 'dart', 'quick', 'ranged'),
-	(8, 'dagger', 'quick', 'sharp'),
-	(9, 'rock', 'quick', 'blunt');
+	(1, 'Pistol', 'one-handed', 'ranged'),
+	(2, 'Sword', 'one-handed', 'sharp'),
+	(3, 'Hammer', 'one-handed', 'blunt'),
+	(4, 'Rifle', 'two-handed', 'ranged'),
+	(5, 'Battle Axe', 'two-handed', 'sharp'),
+	(6, 'Bat', 'two-handed', 'blunt'),
+	(7, 'Dart', 'quick', 'ranged'),
+	(8, 'Dagger', 'quick', 'sharp'),
+	(9, 'Rock', 'quick', 'blunt');
 
 INSERT INTO locations (id, name, tag1, tag2) VALUES
-	(1, 'shed', 'exterior', 'core'),
-	(2, 'pool', 'exterior', 'leisure'),
-	(3, 'shooting range', 'exterior', 'occupational'),
-	(4, 'kitchen', 'interior', 'core'),
-	(5, 'library', 'interior', 'leisure'),
-	(6, 'office', 'interior', 'occupational'),
-	(7, 'storage room', 'underground', 'core'),
-	(8, 'theater', 'underground', 'leisure'),
-	(9, 'workshop', 'underground', 'occupational');
+	(1, 'Shed', 'exterior', 'core'),
+	(2, 'Pool', 'exterior', 'leisure'),
+	(3, 'Shooting Range', 'exterior', 'occupational'),
+	(4, 'Kitchen', 'interior', 'core'),
+	(5, 'Library', 'interior', 'leisure'),
+	(6, 'Office', 'interior', 'occupational'),
+	(7, 'Storage Room', 'underground', 'core'),
+	(8, 'Theater', 'underground', 'leisure'),
+	(9, 'Workshop', 'underground', 'occupational');
 
 INSERT INTO victims (id, name, tag1, tag2) VALUES
 	(1, 'Nora Perez', 'retired', 'lower-class'),
