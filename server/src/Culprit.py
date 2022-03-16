@@ -4,14 +4,25 @@ import random
 # Database-Client Interactions
 
 def get_weapon_id(name):
-    return exec_get_one("SELECT id FROM weapons WHERE name=%(name)s;", {'name': name})
+    data = exec_get_one("SELECT id FROM weapons WHERE name=%(name)s;", {'name': name})
+    if (data is not None):
+        return data[0]
+    else:
+        return None
 
 def get_victim_id(name):
-    return exec_get_one("SELECT id FROM victims WHERE name=%(name)s;", {'name': name})
+    data = exec_get_one("SELECT id FROM victims WHERE name=%(name)s;", {'name': name})
+    if (data is not None):
+        return data[0]
+    else:
+        return None
 
 def get_location_id(name):
-    return exec_get_one("SELECT id FROM locations WHERE name=%(name)s;", {'name': name})
-
+    data = exec_get_one("SELECT id FROM locations WHERE name=%(name)s;", {'name': name})
+    if (data is not None):
+        return data[0]
+    else:
+        return None
 
 def createNewCase(name, player_id, session, color, weapon, location, victim, tokens):
     case_id = session + str(player_id)
@@ -88,7 +99,35 @@ def setPollExcludes(session, id, selected):
         case_id = session + str(s);
         exec_commit("UPDATE cases SET poll_imm = true WHERE id=%(cid)s;", {'cid': case_id});
 
-def getAccusationResults(session, id, player, color):
+def checkEvidence(case_id, evidenceName):
+    print("Finding " + evidenceName)
+    wid = get_weapon_id(evidenceName)
+    if (wid is not None):
+        case_weapon_id = exec_get_one("SELECT weapon_id FROM cases WHERE id=%(id)s;", {'id': case_id})
+        if (case_weapon_id is None):
+            return False
+        else:
+            return wid == case_weapon_id[0];
+
+    vid = get_victim_id(evidenceName);
+    if (vid is not None):
+        case_victim_id = exec_get_one("SELECT victim_id FROM cases WHERE id=%(id)s;", {'id': case_id})
+        if (case_victim_id is None):
+            return False;
+        else:
+            return vid == case_victim_id[0];
+
+    lid = get_location_id(evidenceName);
+    if (lid is not None):
+        case_location_id = exec_get_one("SELECT location_id FROM cases WHERE id=%(id)s;", {'id': case_id})
+        if (case_location_id is None):
+            return False
+        else:
+            return lid == case_location_id[0];
+
+    return False;
+
+def getAccusationResults(session, id, player, color, evidence1, evidence2):
     case_id = session + str(id)
     p_case = session + str(player)
 
@@ -96,7 +135,7 @@ def getAccusationResults(session, id, player, color):
 
     return_dict = dict()
     
-    if (p_case_color == color):
+    if (p_case_color == color and checkEvidence(p_case, evidence1) and checkEvidence(p_case, evidence2)):
         solves = exec_get_all("SELECT id FROM solves WHERE case_id=%(cid)s;", {"cid": p_case})
         exec_commit("INSERT INTO solves (case_id, player_case, first) VALUES (%(cid)s, %(pcid)s, %(first)s);", {"cid": p_case, "pcid": case_id, "first": len(solves) == 0})
         return_dict['correct'] = True;
