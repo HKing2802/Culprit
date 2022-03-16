@@ -750,8 +750,8 @@ class PollExclude extends React.Component {
                     <div className="pollExclude">
                         <h2> Select Players to Exclude </h2>
                         <p> You may choose to exclude no one </p>
-                        <p> It costs 1 Anonymous token to exclude any number of players </p>
-                        <p> You have {this.state.tokens} Anonymous tokens remaining </p>
+                        <p> It costs 1 Corruption token to exclude any number of players </p>
+                        <p> You have {this.state.tokens} Corruption tokens remaining </p>
                         {this.state.error ? (<p className='err'> You must poll at least two people </p>) : null}
                         {this.generatePlayerBtns()}
                         <Button
@@ -899,8 +899,8 @@ class PlayerAnon extends React.Component {
         } else {
             return (
                 <div className="playerAnon">
-                    <h1> You have {this.state.tokens} Tokens Left </h1>
-                    <h3> Would you like to use a token for this Poll? </h3>
+                    <h1> You have {this.state.tokens} Corruption Tokens Left </h1>
+                    <h3> Would you like to Corrupt your answer? </h3>
                     <Row xs='2' className='confirmBtnRow'>
                         <Button
                             className="confirmBtn"
