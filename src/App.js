@@ -15,11 +15,88 @@ const accuseData = new Map();
 // playerNameMap.set(0, "Adam");
 // --------------------------------
 
-const SERVER_ADDR = "http://98.10.41.100:5000/"
+const SERVER_ADDR = "http://127.0.0.1:5000/"
 
 let CURRENT_PLAYER = 0;
 let SESSION_KEY = null;
 let NUM_PLAYERS = null;
+
+const victims = [
+    "Nora Perez",
+    "Emmett Parker",
+    "Arturo Elliot",
+    "Scott Walters",
+    "Estelle Woods",
+    "Warren Fisher",
+    "Earl Daniels",
+    "Stephanie McBride",
+    "Gregg Washington"
+]
+
+const weapons = [
+    "Hammer",
+    "Pistol",
+    "Sword",
+    "Rock",
+    "Dart",
+    "Dagger",
+    "Bat",
+    "Rifle",
+    "Battle Axe"
+]
+
+const locations = [
+    "Shed",
+    "Pool",
+    "Shooting Range",
+    "Kitchen",
+    "Library",
+    "Office",
+    "Storage Room",
+    "Theater",
+    "Workshop"
+]
+
+// ----------------------- Util -----------------------
+
+function generateOptions(optionStrings) {
+    const options = []
+
+    for (let i = 0; i < optionStrings.length; i++) {
+        options.push(
+            <option key={i} value={optionStrings[i]}>
+                {optionStrings[i]}
+            </option>
+            )
+    }
+
+    return options;
+}
+
+class BackBtn extends React.Component {
+    constructor(props) {
+        super(props);
+
+        // binding
+        this.back = this.back.bind(this);
+    }
+
+    back() {
+        this.props.changePage(this.props.prevPage);
+    }
+
+    render() {
+        return (
+            <Button
+                className="backBtn"
+                color="primary"
+                onClick={this.back}
+            >
+                Back
+            </Button>
+        )
+    }
+}
 
 // ----------------------- Headers -----------------------
 
@@ -144,18 +221,18 @@ class CaseSetup extends React.Component {
         })
             .then(response => {
                 console.log(`Case info submitted with status code ${response.status}`);
+
+                if (this.props.checkSetupComplete()) {
+                    this.props.loadPlayerNameMap();
+                    this.props.nextPlayer();
+                    this.props.changePage("nextPlayerTurn");
+                } else {
+                    this.props.changePage("nextPlayerSetup");
+                }
             })
             .catch(err => {
                 console.log(err);
             });
-
-        if (this.props.checkSetupComplete()) {
-            this.props.loadPlayerNameMap();
-            this.props.nextPlayer();
-            this.props.changePage("nextPlayerTurn");
-        } else {
-            this.props.changePage("nextPlayerSetup");
-        }
     }
 
     updateInfo(e) {
@@ -164,7 +241,7 @@ class CaseSetup extends React.Component {
 
     render() {
         return (
-            <Form onSubmit={this.submitCaseInfo}>
+            <Form>
                 <FormGroup className="caseInput">
                     <Label for="name">
                         Name
@@ -219,33 +296,7 @@ class CaseSetup extends React.Component {
                         onChange={this.updateInfo}
                     >
                         <option selected hidden />
-                        <option value="Nora Perez">
-                            Nora Perez
-                        </option>
-                        <option value="Emmett Parker">
-                            Emmett Parker
-                        </option>
-                        <option value="Arturo Elliot">
-                            Arturo Elliot
-                        </option>
-                        <option value="Scott Walters">
-                            Scott Walters
-                        </option>
-                        <option value="Estelle Woods">
-                            Estelle Woods
-                        </option>
-                        <option value="Warren Fisher">
-                            Warren Fisher
-                        </option>
-                        <option value="Earl Daniels">
-                            Earl Daniels
-                        </option>
-                        <option value="Stephanie McBride">
-                            Stephanie McBride
-                        </option>
-                        <option value="Gregg Washington">
-                            Gregg Washington
-                        </option>
+                        {generateOptions(victims)}
                     </Input>
                 </FormGroup>
                 <FormGroup className="caseInput">
@@ -259,33 +310,7 @@ class CaseSetup extends React.Component {
                         onChange={this.updateInfo}
                     >
                         <option selected hidden />
-                        <option value="hammer">
-                            Hammer
-                        </option>
-                        <option value="pistol">
-                            Pistol
-                        </option>
-                        <option value="sword">
-                            Sword
-                        </option>
-                        <option value="rock">
-                            Rock
-                        </option>
-                        <option value="dart">
-                            Dart
-                        </option>
-                        <option value="dagger">
-                            Dagger
-                        </option>
-                        <option value="bat">
-                            Bat
-                        </option>
-                        <option value="rifle">
-                            Rifle
-                        </option>
-                        <option value="battle axe">
-                            Battle Axe
-                        </option>
+                        {generateOptions(weapons)}
                     </Input>
                 </FormGroup>
                 <FormGroup className="caseInput">
@@ -299,43 +324,16 @@ class CaseSetup extends React.Component {
                         onChange={this.updateInfo}
                     >
                         <option slected hidden />
-                        <option value="shed">
-                            Shed
-                        </option>
-                        <option value="pool">
-                            Pool
-                        </option>
-                        <option value="shooting range">
-                            Shooting Range
-                        </option>
-                        <option value="kitchen">
-                            Kitchen
-                        </option>
-                        <option value="library">
-                            Library
-                        </option>
-                        <option value="office">
-                            Office
-                        </option>
-                        <option value="storage room">
-                            Storage Room
-                        </option>
-                        <option value="theater">
-                            Theater
-                        </option>
-                        <option value="workshop">
-                            Workshop
-                        </option>
+                        {generateOptions(locations)}
                     </Input>
                 </FormGroup>
-                <FormGroup className="caseSubmit">
-                    <Input
-                        className="caseSubmitBtn"
-                        id="submit"
-                        value="Submit"
-                        type="submit"
-                    />
-                </FormGroup>
+                <Button
+                    className="caseSubmit"
+                    color='primary'
+                    onClick={this.submitCaseInfo}
+                >
+                    Submit
+                </Button>
             </Form>
         )
     }
@@ -459,31 +457,6 @@ class PlayerActionSelect extends React.Component {
                 </Button>
             </div>
         );
-    }
-}
-
-class BackBtn extends React.Component {
-    constructor(props) {
-        super(props);
-
-        // binding
-        this.back = this.back.bind(this);
-    }
-
-    back() {
-        this.props.changePage(this.props.prevPage);
-    }
-
-    render() {
-        return (
-            <Button
-                className="backBtn"
-                color="primary"
-                onClick={this.back}
-            >
-                Back
-            </Button>
-        )
     }
 }
 
@@ -1105,6 +1078,50 @@ class Accuse extends React.Component {
                                 </option>
                             </Input>
                         </FormGroup>
+                        <FormGroup className="accuseInput">
+                            <Label for='ev1'>
+                                Evidence 1
+                            </Label>
+                            <Input
+                                id="ev1"
+                                name="Accuse Evidence 1"
+                                type="select"
+                                onChange={this.updateInfo}
+                            >
+                                <option selected hidden />
+                                <optgroup>
+                                    {generateOptions(victims)}
+                                </optgroup>
+                                <optgroup>
+                                    {generateOptions(weapons)}
+                                </optgroup>
+                                <optgroup>
+                                    {generateOptions(locations)}
+                                </optgroup>
+                            </Input>
+                        </FormGroup>
+                        <FormGroup className="accuseInput">
+                                <Label for='ev2'>
+                                    Evidence 2
+                            </Label>
+                                <Input
+                                    id="ev2"
+                                    name="Accuse Evidence 2"
+                                    type="select"
+                                    onChange={this.updateInfo}
+                                >
+                                    <option selected hidden />
+                                    <optgroup>
+                                        {generateOptions(victims)}
+                                    </optgroup>
+                                    <optgroup>
+                                        {generateOptions(weapons)}
+                                    </optgroup>
+                                    <optgroup>
+                                        {generateOptions(locations)}
+                                    </optgroup>
+                                </Input>
+                        </FormGroup>
                         <Button
                             color='primary'
                             onClick={this.nextPage}
@@ -1137,7 +1154,7 @@ class AccuseDisplay extends React.Component {
             headers: {
                 'Content-Type': 'application/json'
             },
-            body: JSON.stringify({ session: SESSION_KEY, id: CURRENT_PLAYER, player: accuseData.get('player'), color: accuseData.get('color') })
+            body: JSON.stringify({ session: SESSION_KEY, id: CURRENT_PLAYER, player: accuseData.get('player'), color: accuseData.get('color'), ev1: accuseData.get('ev1'), ev2: accuseData.get('ev2') })
         })
             .then(res => res.json())
             .then(response => {
