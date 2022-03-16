@@ -38,6 +38,8 @@ accuseParser.add_argument('session')
 accuseParser.add_argument('id')
 accuseParser.add_argument('player')
 accuseParser.add_argument('color')
+accuseParser.add_argument('ev1')
+accuseParser.add_argument('ev2')
 
 endGameCheck = reqparse.RequestParser()
 endGameCheck.add_argument('session')
@@ -96,7 +98,7 @@ class PollExclude(Resource):
 class Accuse(Resource):
     def post(self):
         args = accuseParser.parse_args()
-        return getAccusationResults(args["session"], args["id"], args["player"], args["color"]), 200
+        return getAccusationResults(args["session"], args["id"], args["player"], args["color"], args['ev1'], args['ev2']), 200
 
 class CheckEndGame(Resource):
     def post(self):
