@@ -11,6 +11,8 @@ let pollTarget = null;
 
 const accuseData = new Map();
 
+const postData = new Map();
+
 // ----------- DEV TEMP -----------
 // playerNameMap.set(0, "Adam");
 // --------------------------------
@@ -425,6 +427,14 @@ class PlayerActionSelect extends React.Component {
         this.props.changePage("accuse");
     }
 
+    startPost() {
+        this.props.changePage("post");
+    }
+
+    startPostReveal() {
+        this.props.changePage("postRevealSelector");
+    }
+
     endTurn() {
         this.props.changePage("endTurnConfirm");
     }
@@ -451,10 +461,25 @@ class PlayerActionSelect extends React.Component {
                 <Button
                     className="actionBtn"
                     color="primary"
+                    onClick={this.startPost}
+                >
+                    Post
+                </Button>
+                <Button
+                    className="actionBtn"
+                    color="primary"
+                    onClick={this.startPostReveal}
+                >
+                    Reveal Post
+                </Button>
+                <Button
+                    className="actionBtn"
+                    color="primary"
                     onClick={this.endTurn}
                 >
                     End Turn
                 </Button>
+                
             </div>
         );
     }
@@ -1265,6 +1290,325 @@ class AccuseEndGame extends React.Component {
 }
 
 
+// ----------------------- Post -----------------------
+
+class Post extends React.Component {
+    constructor(props) {
+        super(props);
+
+        // bindings
+        this.setData = this.setData.bind(this);
+    }
+
+    setData(e) {
+        postData.set('type', e.target.value);
+
+        this.props.changePage("postTag");
+    }
+
+    render() {
+        return (
+            <div>
+                <BackBtn changePage={this.props.changePage} prevPage="playerActionSelect" />
+                <div className="poll">
+                    <Button
+                        className="pollTypeBtn"
+                        color="primary"
+                        value="weapon"
+                        onClick={this.setData}
+                    >
+                        Weapon
+                    </Button>
+                    <Button
+                        className="pollTypeBtn"
+                        color="primary"
+                        value="location"
+                        onClick={this.setData}
+                    >
+                        Location
+                    </Button>
+                    <Button
+                        className="pollTypeBtn"
+                        color="primary"
+                        value="victim"
+                        onClick={this.setData}
+                    >
+                        Victim
+                    </Button>
+                </div>
+            </div>
+        );
+    }
+}
+
+class PostTag extends React.Component {
+    constructor(props) {
+        super(props);
+
+        // bindings
+        this.setData = this.setData.bind(this);
+
+        // tag hardcodes
+        this.tagMap = new Map();
+        this.tagMap.set('weapon', ['One-Handed', 'Ranged', 'Two-Handed', 'Sharp', 'Quick', 'Blunt']);
+        this.tagMap.set('location', ['Exterior', 'Core', 'Interior', 'Leisure', 'Underground', 'Occupational']);
+        this.tagMap.set('victim', ['Retired', 'Lower-Class', 'Student', 'Middle-Class', 'Working', 'Upper-Class']);
+    }
+
+    setData(e) {
+        postData.set('tag', e.target.value);
+
+        this.props.changePage("postCount");
+    }
+
+    render() {
+        console.log(postData);
+        const type = postData.get('type');
+        if (type === null) {
+            return (
+                <div>
+                    <BackBtn changePage={this.props.changePage} prevPage="post" />
+                    <div className="pollTagLoading">
+                        Loading...
+                    </div>
+                </div>
+            );
+        }
+        return (
+            <div>
+                <BackBtn changePage={this.props.changePage} prevPage="post" />
+                <Container className="pollTag">
+                    <Row xs='2' className="pollTagRow">
+                        <Col className="tagBtnCol" >
+                            <Button
+                                color='primary'
+                                value={this.tagMap.get(type)[0].toLowerCase()}
+                                onClick={this.setData}
+                            >
+                                {this.tagMap.get(type)[0]}
+                            </Button>
+                        </Col>
+                        <Col className="tagBtnCol" >
+                            <Button
+                                color='primary'
+                                value={this.tagMap.get(type)[1].toLowerCase()}
+                                onClick={this.setData}
+                            >
+                                {this.tagMap.get(type)[1]}
+                            </Button>
+                        </Col>
+                    </Row>
+                    <Row xs='2' className="pollTagRow">
+                        <Col className="tagBtnCol" >
+                            <Button
+                                color='primary'
+                                value={this.tagMap.get(type)[2].toLowerCase()}
+                                onClick={this.setData}
+                            >
+                                {this.tagMap.get(type)[2]}
+                            </Button>
+                        </Col>
+                        <Col className="tagBtnCol" >
+                            <Button
+                                color='primary'
+                                value={this.tagMap.get(type)[3].toLowerCase()}
+                                onClick={this.setData}
+                            >
+                                {this.tagMap.get(type)[3]}
+                            </Button>
+                        </Col>
+                    </Row>
+                    <Row xs='2' className="pollTagRow">
+                        <Col className="tagBtnCol" >
+                            <Button
+                                color='primary'
+                                value={this.tagMap.get(type)[4].toLowerCase()}
+                                onClick={this.setData}
+                            >
+                                {this.tagMap.get(type)[4]}
+                            </Button>
+                        </Col>
+                        <Col className="tagBtnCol" >
+                            <Button
+                                color='primary'
+                                value={this.tagMap.get(type)[5].toLowerCase()}
+                                onClick={this.setData}
+                            >
+                                {this.tagMap.get(type)[5]}
+                            </Button>
+                        </Col>
+                    </Row>
+                </Container>
+            </div>
+        );
+    }
+}
+
+class PostCount extends React.Component {
+    constructor(props) {
+        super(props);
+
+        // bindings
+        this.setData = this.setData.bind(this);
+    }
+
+    setData(e) {
+        postData.set("count", e.target.value);
+
+        this.props.changePage("postConfirm");
+    }
+
+    render() {
+        return (
+            <div>
+                <BackBtn changePage={this.props.changePage} prevPage="postTag" />
+                <div className="postCount">
+                    <Row>
+                        <Col>
+                            <Button
+                                className="postCountBtn"
+                                color='primary'
+                                value='0'
+                                onClick={this.setData}
+                            >
+                                0
+                            </Button>
+                        </Col>
+                        <Col>
+                            <Button
+                                className="postCountBtn"
+                                color='primary'
+                                value='1'
+                                onClick={this.setData}
+                            >
+                                1
+                            </Button>
+                        </Col>
+                        <Col>
+                            <Button
+                                className="postCountBtn"
+                                color='primary'
+                                value='2'
+                                onClick={this.setData}
+                            >
+                                2
+                            </Button>
+                        </Col>
+                        <Col>
+                            <Button
+                                className="postCountBtn"
+                                color='primary'
+                                value='3'
+                                onClick={this.setData}
+                            >
+                                3
+                            </Button>
+                        </Col>
+                    </Row>
+                </div>
+            </div>
+        );
+    }
+}
+
+class PostConfirm extends React.Component {
+    constructor(props) {
+        super(props);
+
+        // state
+        this.state = { result: null, error: false };
+
+        // bindings
+        this.endTurn = this.endTurn.bind(this);
+    }
+
+    componentDidMount() {
+        fetch(`${SERVER_ADDR}post`, {
+            method: 'POST',
+            mode: "cors",
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({session: SESSION_KEY, id: CURRENT_PLAYER, type: postData.get('type'), tag: postData.get('tag'), count: postData.get('count')})
+        })
+            .then(res => res.json())
+            .then(response => {
+                this.setState({ result: response.result });
+            })
+            .catch(err => {
+                console.log(err);
+                this.setState({ error: true });
+            })
+    }
+
+    endTurn() {
+        this.props.nextPlayer();
+        this.props.changePage("nextPlayerTurn")
+    }
+
+    render() {
+        if (this.state.result === null && !this.state.error) {
+            return (
+                <div>
+                    Loading...
+                </div>
+            );
+        } else if (this.state.error) {
+            return (
+                <div>
+                    There was an error sending your request
+                </div>
+            );
+        } else {
+            if (this.state.result === "locked") {
+                return (
+                    <div>
+                        <BackBtn changePage={this.props.changePage} prevPage="postCount" />
+                        <div className="postConfirm">
+                            <h4>This post is locked in already and can't be posted to</h4>
+                            <p>Please select another post to post to</p>
+                        </div>
+                    </div>
+                );
+            } else {
+                return (
+                    <div className="postConfirm">
+                        <h4> Success </h4>
+                        <p>On your next turn, as a free action, you can reveal this post</p>
+                        <Button
+                            className="postConfirmNextBtn"
+                            color='primary'
+                            onClick={this.endTurn}
+                        >
+                            End Turn
+                        </Button>
+                    </div>
+                );
+            }
+        }
+    }
+}
+
+class PostRevealSelector extends React.Component {
+    constructor(props) {
+        super(props);
+
+        // bindings
+
+    }
+
+    render() {
+        return (
+            <div>
+                <BackBtn changePage={this.changePage} prevPage="playerActionSelect" />
+                <div className="postRevealSelector">
+                    borked
+                </div>
+            </div>
+        )
+    }
+}
+
 // ----------------------- End of Game -----------------------
 
 class EndofGame extends React.Component {
@@ -1598,7 +1942,7 @@ class App extends React.Component {
         if (this.props.load) {
             this.state = { page: "loadGame", sessionKey: null, playerMapLoaded: false };
         } else {
-            this.state = { page: "numPlayerSelect", sessionKey: null, playerMapLoaded: false };
+            this.state = { page: "playerActionSelect", sessionKey: null, playerMapLoaded: false };
         }
 
         // loads PageComponent Map
@@ -1611,7 +1955,7 @@ class App extends React.Component {
         pageComponentMap.set("numPlayerSelect", <NumPlayerSelect changePage={this.changePage} setNumPlayers={this.setNumPlayers} generateSesionKey={this.generateSesionKey} />);
         pageComponentMap.set("caseSetup", <CaseSetup changePage={this.changePage} checkSetupComplete={this.checkSetupComplete} loadPlayerNameMap={this.loadPlayerNameMap} nextPlayer={this.nextPlayer} />);
         pageComponentMap.set("nextPlayerSetup", <NextPlayerSetup changePage={this.changePage} nextPlayer={this.nextPlayer} />);
-        pageComponentMap.set("loadGame", <LoadGame changePage={this.changePage} setNumPlayers={this.setNumPlayers} loadPlayerNameMap={this.loadPlayerNameMap} />)
+        pageComponentMap.set("loadGame", <LoadGame changePage={this.changePage} setNumPlayers={this.setNumPlayers} loadPlayerNameMap={this.loadPlayerNameMap} />);
 
         // main loop
         pageComponentMap.set("nextPlayerTurn", <NextPlayerTurn playerMapLoaded={this.state.playerMapLoaded} changePage={this.changePage} />);
@@ -1621,19 +1965,26 @@ class App extends React.Component {
         // polling
         pageComponentMap.set("poll", <Poll changePage={this.changePage} />);
         pageComponentMap.set("pollTag", <PollTag changePage={this.changePage} />);
-        pageComponentMap.set("pollExclude", <PollExclude changePage={this.changePage} nextPlayer={this.nextPlayer} />)
-        pageComponentMap.set('nextPlayerPoll', <NextPlayerPoll changePage={this.changePage} />)
-        pageComponentMap.set('playerAnon', <PlayerAnon changePage={this.changePage} nextPlayer={this.nextPlayer} />)
-        pageComponentMap.set('pollDisplay', <PollDisplay changePage={this.changePage} nextPlayer={this.nextPlayer} />)
+        pageComponentMap.set("pollExclude", <PollExclude changePage={this.changePage} nextPlayer={this.nextPlayer} />);
+        pageComponentMap.set('nextPlayerPoll', <NextPlayerPoll changePage={this.changePage} />);
+        pageComponentMap.set('playerAnon', <PlayerAnon changePage={this.changePage} nextPlayer={this.nextPlayer} />);
+        pageComponentMap.set('pollDisplay', <PollDisplay changePage={this.changePage} nextPlayer={this.nextPlayer} />);
 
         // accuse
         pageComponentMap.set("accuse", <Accuse changePage={this.changePage} />);
-        pageComponentMap.set("accuseDisplay", <AccuseDisplay changePage={this.changePage} />)
-        pageComponentMap.set("accuseEndGame", <AccuseEndGame changePage={this.changePage} nextPlayer={this.nextPlayer} />)
+        pageComponentMap.set("accuseDisplay", <AccuseDisplay changePage={this.changePage} />);
+        pageComponentMap.set("accuseEndGame", <AccuseEndGame changePage={this.changePage} nextPlayer={this.nextPlayer} />);
+
+        // post
+        pageComponentMap.set("post", <Post changePage={this.changePage} />);
+        pageComponentMap.set("postTag", <PostTag changePage={this.changePage} />);
+        pageComponentMap.set("postCount", <PostCount changePage={this.changePage} />);
+        pageComponentMap.set("postConfirm", <PostConfirm changePage={this.changePage} nextPlayer={this.nextPlayer} />);
+        pageComponentMap.set("postRevealSelector", <PostRevealSelector changePage={this.changePage} />);
 
         // game end
         pageComponentMap.set("endOfGame", <EndofGame changePage={this.changePage} nextPlayer={this.nextPlayer} />);
-        pageComponentMap.set("endGameDisplay", <EndGameDisplay />)
+        pageComponentMap.set("endGameDisplay", <EndGameDisplay />);
 
         this.forceUpdate();
     }
