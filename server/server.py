@@ -21,6 +21,7 @@ api.add_resource(Accuse, '/accuse')
 api.add_resource(CheckEndGame, '/check-end')
 api.add_resource(EndGameData, '/end')
 api.add_resource(LoadGame, '/load')
+api.add_resource(Post, "/post")
 
 if __name__ == '__main__':
     print("Building Database")
