@@ -114,3 +114,10 @@ class LoadGame(Resource):
     def post(self):
         args = loadGameParser.parse_args()
         return getLoadGameData(args['session']), 200
+
+class Post(Resource):
+    def post(self):
+        returnDict = dict()
+        returnDict['result'] = "locked"
+        
+        return returnDict, 201
